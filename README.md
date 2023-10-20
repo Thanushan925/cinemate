@@ -5,7 +5,7 @@ Group members (3-5) (no Student IDs, only names and github usernames):
 
 1. James Yang - ZHJamesY
 
-2. Vedant Vaidya
+2. Vedant Vaidya (Vedanthere)
 
 3. 
 
