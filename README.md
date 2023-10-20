@@ -7,7 +7,7 @@ Group members (3-5) (no Student IDs, only names and github usernames):
 
 2. Vedant Vaidya (Vedanthere)
 
-3. 
+3. Thanushan Satheeskumar (Thanushan925)
 
 4. 
 
