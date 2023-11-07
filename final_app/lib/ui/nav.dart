@@ -12,11 +12,11 @@ class Nav extends StatefulWidget {
 class _NavState extends State<Nav> {
   PageController _pageController = PageController(initialPage: 0);
   int _selectedIndex = 0;
-  List<Widget> _widgetOptions = <Widget>[
+  final List<Widget> _widgetOptions = <Widget>[
     Home(),
     BrowsingPage(),
     CinemaPage(),
-    AccountPage(),
+    AccountPage(message: ''),
   ];
 
   double _getIconSize(int index) {
