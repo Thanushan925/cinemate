@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:final_app/firestore/account_model.dart';
+import 'package:final_app/firebase/account_model.dart';
 import 'package:final_app/ui/account_page.dart';
 
 // void main() {

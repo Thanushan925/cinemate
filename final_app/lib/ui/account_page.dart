@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:final_app/firestore/access_accounts.dart';
+import 'package:final_app/firebase/access_accounts.dart';
 
 class AccountPage extends StatefulWidget {
 
