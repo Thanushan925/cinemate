@@ -78,13 +78,19 @@ class LoginSuccess extends StatelessWidget {
     return FutureBuilder<DocumentSnapshot>(
       future: accounts.doc(documentId).get(),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
         if (snapshot.hasError) {
           return Text("Error: ${snapshot.error}");
         }
+        if (!snapshot.hasData || snapshot.data == null) {
+          return Center(
+            child: Text('No data available'),
+          );
+        }
 
-        print("documentID: $documentId **********************************************8");
-
-        Account account = Account.fromMap(snapshot.data!.data(), reference: snapshot.data!.reference);
+        Account account = Account.fromMap(snapshot.data!.data(),reference: snapshot.data!.reference);
         String? username = extractUsername(account.username!);
 
         return Scaffold(
@@ -92,13 +98,14 @@ class LoginSuccess extends StatelessWidget {
             title: Text('Welcome $username'),
           ),
           body: Center(
-            child: Text('successflly logged in'),
+            child: Text('successfully logged in'),
           ),
         );
       },
     );
   }
 }
+
 
 String extractUsername(String input) {
   if (input.contains('@')) {
