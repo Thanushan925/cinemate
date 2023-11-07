@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:final_app/firebase/access_accounts.dart';
 
 class AccountPage extends StatefulWidget {
-
   String? message = '';
 
   AccountPage({required this.message});
@@ -15,17 +14,34 @@ class _AccountPageState extends State<AccountPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // Function that shows a Snackbar with the given message
+  void _showErrorSnackbar(BuildContext context, String message) {
+    final snackbar = SnackBar(
+      content: Row(
+        children: [
+          Icon(Icons.error, color: Colors.white),
+          SizedBox(width: 8),
+          Text(message, style: TextStyle(color: Colors.white)),
+        ],
+      ),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('Account'),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (widget.message != '' &&  widget.message != null)
+          if (widget.message != '' && widget.message != null)
             Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
@@ -67,6 +83,7 @@ class _AccountPageState extends State<AccountPage> {
           Center(
             child: ElevatedButton(
               onPressed: () {
+                _showErrorSnackbar(context, "Error Signing In! Please Try Again.");
                 Navigator.push(
                   context,
                   MaterialPageRoute(

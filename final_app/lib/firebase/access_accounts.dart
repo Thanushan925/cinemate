@@ -51,7 +51,7 @@ class FirestoreAccounts extends StatelessWidget {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => AccountPage(
-                          message: 'Account/Password Incorrect')));
+                          message: 'Your account or password is incorrect.')));
                 });
                 return CircularProgressIndicator();
               }
@@ -90,15 +90,31 @@ class LoginSuccess extends StatelessWidget {
           );
         }
 
-        Account account = Account.fromMap(snapshot.data!.data(),reference: snapshot.data!.reference);
+        Account account = Account.fromMap(snapshot.data!.data(), reference: snapshot.data!.reference);
         String? username = extractUsername(account.username!);
+
+        // Shows a Snackbar when login is successful
+        Future.delayed(Duration.zero, () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text('Login Successful', style: TextStyle(color: Colors.white)),
+                ],
+              ),
+              backgroundColor: Colors.green,
+            ),
+          );
+        });
 
         return Scaffold(
           appBar: AppBar(
             title: Text('Welcome $username'),
           ),
           body: Center(
-            child: Text('successfully logged in'),
+            child: Text('You have Successfully Logged In!'),
           ),
         );
       },
