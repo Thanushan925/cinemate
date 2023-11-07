@@ -47,6 +47,8 @@ class _NavState extends State<Nav> {
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.green, // Set selected item color to green
+        unselectedItemColor: Colors.blue, // Set unselected item color to blue
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(
@@ -69,20 +71,16 @@ class _NavState extends State<Nav> {
             ),
             label: 'Cinema Page',
           ),
-
           BottomNavigationBarItem(
             icon: Icon(
               Icons.person,
-              size: _getIconSize(2),
+              size: _getIconSize(3),
             ),
             label: 'Profile',
           ),
-
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTap,
-        selectedFontSize: 13.0,
-        unselectedFontSize: 13.0,
       ),
     );
   }
