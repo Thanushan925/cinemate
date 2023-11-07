@@ -1,3 +1,4 @@
+import 'package:final_app/ui/cinema_page.dart';
 import 'package:flutter/material.dart';
 import 'homepage.dart';
 import 'browsing_page.dart';
@@ -14,6 +15,7 @@ class _NavState extends State<Nav> {
   List<Widget> _widgetOptions = <Widget>[
     Home(),
     BrowsingPage(),
+    CinemaPage(),
     AccountPage(),
   ];
 
@@ -62,11 +64,20 @@ class _NavState extends State<Nav> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
+              Icons.map,
+              size: _getIconSize(2),
+            ),
+            label: 'Cinema Page',
+          ),
+
+          BottomNavigationBarItem(
+            icon: Icon(
               Icons.person,
               size: _getIconSize(2),
             ),
             label: 'Profile',
           ),
+
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTap,
