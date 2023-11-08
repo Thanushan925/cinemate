@@ -69,7 +69,7 @@ class _NavState extends State<Nav> {
               Icons.map,
               size: _getIconSize(2),
             ),
-            label: 'Cinema Page',
+            label: 'Cinema',
           ),
           BottomNavigationBarItem(
             icon: Icon(
