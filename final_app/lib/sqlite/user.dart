@@ -7,7 +7,7 @@ class User{
 
   User({this.id, this.username, this.password});
 
-  User.toMap(Map map){
+  User.fromMap(Map map){
     this.id = map['id'];
     this.username = map['username'];
     this.password = map['password'];
