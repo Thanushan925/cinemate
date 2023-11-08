@@ -77,8 +77,9 @@ class _HomeState extends State<Home> {
               return SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
+                    SizedBox(height: 10),
                     Text(
-                      'Now Playing',
+                      'Popular',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -96,14 +97,29 @@ class _HomeState extends State<Home> {
                                 builder: (context) {
                                   return AlertDialog(
                                     title: Text(movie.name),
+                                    actions: [
+                                      IconButton(
+                                        icon: Icon(Icons.close),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
                                     content: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
+                                        Image.network(
+                                          movie.largePosterImageUrl,
+                                          width: 250,
+                                          height: 300,
+                                        ),
+                                        SizedBox(height: 20),
                                         Text('Runtime: ${movie.runtime}'),
                                         Text(
-                                            'Release Date: ${movie.releaseDate}'),
+                                          'Release Date: ${movie.releaseDate}',
+                                        ),
                                       ],
                                     ),
                                   );
