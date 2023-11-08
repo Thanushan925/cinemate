@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Movie {
-  final int id;
-  final String name;
-  final String runtime;
-  final String releaseDate;
-  final String largePosterImageUrl;
+  int? id;
+  String? name;
+  String? runtime;
+  String? releaseDate;
+  String? largePosterImageUrl;
 
   Movie({
     required this.id,
@@ -121,7 +121,7 @@ class _HomeState extends State<Home> {
                                 context: context,
                                 builder: (context) {
                                   return AlertDialog(
-                                    title: Text(movie.name),
+                                    title: Text(movie.name!),
                                     actions: [
                                       IconButton(
                                         icon: Icon(Icons.close),
@@ -136,7 +136,7 @@ class _HomeState extends State<Home> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Image.network(
-                                          movie.largePosterImageUrl,
+                                          movie.largePosterImageUrl!,
                                           width: 250,
                                           height: 300,
                                         ),
@@ -156,11 +156,11 @@ class _HomeState extends State<Home> {
                               child: Column(
                                 children: [
                                   Image.network(
-                                    movie.largePosterImageUrl,
+                                    movie.largePosterImageUrl!,
                                     width: 200,
                                     height: 250,
                                   ),
-                                  Text(movie.name),
+                                  Text(movie.name!),
                                 ],
                               ),
                             ),
@@ -180,8 +180,8 @@ class _HomeState extends State<Home> {
                       itemBuilder: (context, index) {
                         final movie = movies[index];
                         return ListTile(
-                          leading: Image.network(movie.largePosterImageUrl),
-                          title: Text(movie.name),
+                          leading: Image.network(movie.largePosterImageUrl!),
+                          title: Text(movie.name!),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

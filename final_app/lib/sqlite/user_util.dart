@@ -5,7 +5,7 @@ class UserDBUtils{
   static Future init() async{
     //sets up database
     var database = await openDatabase(
-      path.join(await getDatabasePath(), 'user.db'),
+      path.join(await getDatabasesPath(), 'user.db'),
       onCreate: (db, version){
         db.execute(
           'CREATE TABLE users_info(id INTEGER PRIMARY KEY, username TEXT, password TEXT)'

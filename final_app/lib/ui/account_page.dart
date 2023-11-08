@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:final_app/firebase/access_accounts.dart';
+import 'package:final_app/firebase/sign_in.dart';
+import 'package:final_app/firebase/sign_up.dart';
 
 class AccountPage extends StatefulWidget {
   String? message = '';
@@ -11,14 +12,104 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _isPasswordVisible = false;
+
+  String? _isExist;
+  String? _username;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // Function that shows a Snackbar with the given message
-  void _showErrorSnackbar(BuildContext context, String message) {
-    final snackbar = SnackBar(
+  void _signOut() {
+    setState(() {
+      _isExist = 'false';
+      _username = '';
+    });
+  }
+
+  void _navigateSignIn(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SignIn()),
+    );
+
+    if (result != null) {
+      setState(() {
+        _isExist = result['isExist'];
+        _username = result['username'];
+
+        if (_isExist == 'true') 
+        {
+          showSnackBar("Sign In Successful.", _isExist!, context);
+        }
+      });
+    }
+  }
+
+  void _navigateSignUp(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SignUP()),
+    );
+
+    if (result != null) {
+      setState(() {
+        _isExist = result['isExist'];
+
+        if (_isExist == 'false') 
+        {
+          showSnackBar("Sign up Successful.", 'true', context);
+        }
+      });
+    }
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: _isExist == 'true' ? Text('Welcome $_username') : Text('Account Page'),
+        actions: <Widget>[
+          if (_isExist == 'true')
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () {
+                _signOut();
+              },
+            ),
+        ],
+      ),
+      body: Center(
+        child: _isExist == 'true'
+            ? Text('Welcome')
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      _navigateSignIn(context);
+                    },
+                    child: Text('Sign In'),
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      _navigateSignUp(context);
+                    },
+                    child: Text('Sign Up'),
+                  ),
+                ],
+              ),
+      )
+    );
+  }
+}
+
+
+void showSnackBar(String message, String isExist, BuildContext context) {
+  SnackBar? snackBar;
+  if (isExist == 'false') {
+    snackBar = SnackBar(
       content: Row(
         children: [
           Icon(Icons.error, color: Colors.white),
@@ -28,77 +119,17 @@ class _AccountPageState extends State<AccountPage> {
       ),
       backgroundColor: Colors.red,
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        title: Text('Account'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+  } else if (isExist == 'true') {
+    snackBar = SnackBar(
+      content: Row(
         children: [
-          if (widget.message != '' && widget.message != null)
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: Text(
-                widget.message!,
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Username',
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _passwordController,
-              obscureText: !_isPasswordVisible,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Password',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                _showErrorSnackbar(context, "Error Signing In! Please Try Again.");
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => FirestoreAccounts(
-                      username: _usernameController.text,
-                      password: _passwordController.text,
-                    ),
-                  ),
-                );
-              },
-              child: Text('Sign in'),
-            ),
-          ),
+          Icon(Icons.check, color: Colors.white),
+          SizedBox(width: 8),
+          Text(message, style: TextStyle(color: Colors.white)),
         ],
       ),
+      backgroundColor: Colors.green,
     );
   }
+  ScaffoldMessenger.of(context).showSnackBar(snackBar!);
 }

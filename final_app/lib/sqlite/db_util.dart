@@ -5,7 +5,7 @@ class DBUtils{
   static Future init() async{
     //sets up database
     var database = await openDatabase(
-      path.join(await getDatabasePath(), 'favorites.db'),
+      path.join(await getDatabasesPath(), 'favorites.db'),
       onCreate: (db, version){
         db.execute(
           'CREATE TABLE user_favorites(id INTEGER PRIMARY KEY, name TEXT, runtime TEXT, releaseDate TEXT, largePosterImageUrl TEXT)'

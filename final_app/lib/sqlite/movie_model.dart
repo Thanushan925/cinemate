@@ -1,4 +1,5 @@
-import 'package:final_app/homepage.dart';
+import 'package:final_app/ui/homepage.dart';
+
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'db_util.dart';
@@ -23,7 +24,7 @@ class MovieModel{
 
     for(int i = 0; i < maps.length; i++){
       result.add(
-        Movie.fromMap(maps[i]);
+        Movie.fromMap(maps[i])
       );
     }
     return result;
@@ -33,7 +34,7 @@ class MovieModel{
     final db = await DBUtils.init();
     return db.update(
       'user_favorites',
-      movie.toMap();
+      movie.toMap(),
       where: 'id = ?',
       whereArgs: [movie.id],
     );
