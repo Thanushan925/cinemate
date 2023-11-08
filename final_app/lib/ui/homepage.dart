@@ -16,6 +16,31 @@ class Movie {
     required this.releaseDate,
     required this.largePosterImageUrl,
   });
+
+  ///////////////
+  Movie.fromMap(Map map){
+    id = map['id'];
+    name = map['name'];
+    runtime = map['runtime'];
+    releaseDate = map['releaseDate'];
+    largePosterImageUrl = map['largePosterImageUrl'];
+  }
+
+  Map<String, Object?> toMap(){
+    return {
+      'id': this.id,
+      'name': this.name,
+      'runtime': this.runtime,
+      'releaseDate': this.releaseDate,
+      'largePosterImageUrl': this.largePosterImageUrl
+    };
+  }
+
+  String toString(){
+    return "Movie id: $id, name: $name, runtime: $runtime, releas date: $releaseDate";
+  }
+
+  ///////////////////// Don't delete yet until I confirmed if needed here or another place
 }
 
 Future<List<Movie>> fetchMovies() async {
