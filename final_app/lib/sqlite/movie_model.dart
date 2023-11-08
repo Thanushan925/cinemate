@@ -1,4 +1,4 @@
-import 'package:final_app/lib/ui/homepage.dart';
+import 'package:final_app/homepage.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'db_util.dart';

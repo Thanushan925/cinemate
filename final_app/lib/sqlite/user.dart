@@ -13,7 +13,7 @@ class User{
     this.password = map['password'];
   }
 
-  Map<String, Object> toMap(){
+  Map<String, Object?> toMap(){
     return{
       'id': this.id!,
       'username': this.username!,
@@ -22,6 +22,6 @@ class User{
   }
 
   String toString(){
-    return 'ID: $id, Username: $username, Password: $password';
+    return "ID: $id, Username: $username, Password: $password";
   }
 }
