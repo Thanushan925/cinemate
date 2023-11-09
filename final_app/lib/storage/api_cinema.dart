@@ -14,14 +14,8 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> decodedJson = jsonDecode(response.body);
-      List<Cinema> cinemas = [];
-
-      List<dynamic> theatresList = decodedJson['data'] ?? [];
-      for (var theatreJson in theatresList) {
-        var cinema = Cinema.fromJson(theatreJson);
-        cinemas.add(cinema);
-      }
-      return cinemas;
+      List<dynamic> theatresList = decodedJson['data'] as List<dynamic>? ?? [];
+      return theatresList.map((theatreJson) => Cinema.fromJson(theatreJson)).toList();
     } else {
       throw Exception('Failed to load cinemas');
     }
@@ -29,21 +23,50 @@ class ApiService {
 }
 
 class Cinema {
+  final int id;
   final String name;
   final String address;
   final double distance;
+  final List<Experience> experiences;
 
-  Cinema({required this.name, required this.address, required this.distance});
+  Cinema({
+    required this.id,
+    required this.name,
+    required this.address,
+    required this.distance,
+    required this.experiences,
+  });
 
   factory Cinema.fromJson(Map<String, dynamic> json) {
-    String address = "${json['address1']} ${json['city']}, ${json['provinceCode']}, ${json['postalCode']}".trim();
-    double distance = json['distance']; // Assume the distance is provided in the format you wish to display
     return Cinema(
-      name: json['name'],
-      address: address,
-      distance: distance,
+      id: json['id'] ?? 0, // Default value if null
+      name: json['name'] ?? 'Unknown', // Default value if null
+      address: "${json['address1'] ?? ''} ${json['city'] ?? ''}, ${json['provinceCode'] ?? ''}, ${json['postalCode'] ?? ''}".trim(),
+      distance: json['distance']?.toDouble() ?? 0.0, // Default value if null
+      experiences: (json['experiences'] as List<dynamic>?)
+          ?.map((e) => Experience.fromJson(e as Map<String, dynamic>))
+          .toList() ?? [], // Default value if null
     );
   }
 }
+
+class Experience {
+  final String title;
+  final String description;
+
+  Experience({
+    required this.title,
+    required this.description,
+  });
+
+  factory Experience.fromJson(Map<String, dynamic> json) {
+    return Experience(
+      title: json['title'] ?? 'Unknown Experience', // Default value if null
+      description: json['description'] ?? 'Description not available', // Default value if null
+    );
+  }
+}
+
+
 
 
