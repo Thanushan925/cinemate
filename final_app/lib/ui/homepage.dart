@@ -1,6 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class Movie {
   int? id;
@@ -17,8 +18,7 @@ class Movie {
     required this.largePosterImageUrl,
   });
 
-  ///////////////
-  Movie.fromMap(Map map){
+  Movie.fromMap(Map map) {
     id = map['id'];
     name = map['name'];
     runtime = map['runtime'];
@@ -26,7 +26,7 @@ class Movie {
     largePosterImageUrl = map['largePosterImageUrl'];
   }
 
-  Map<String, Object?> toMap(){
+  Map<String, Object?> toMap() {
     return {
       'id': this.id,
       'name': this.name,
@@ -36,11 +36,9 @@ class Movie {
     };
   }
 
-  String toString(){
+  String toString() {
     return "Movie id: $id, name: $name, runtime: $runtime, releas date: $releaseDate";
   }
-
-  ///////////////////// Don't delete yet until I confirmed if needed here or another place
 }
 
 Future<List<Movie>> fetchMovies() async {
@@ -79,11 +77,29 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   late Future<List<Movie>> futureMovies;
+  late ConnectivityResult connectivityResult;
 
   @override
   void initState() {
     super.initState();
     futureMovies = fetchMovies();
+    checkInternetConnectivity();
+  }
+
+  Future<void> checkInternetConnectivity() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      showSnackbar('No internet connection');
+    }
+  }
+
+  void showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
