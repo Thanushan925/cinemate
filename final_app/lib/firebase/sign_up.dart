@@ -1,7 +1,9 @@
+import 'package:final_app/sqlite/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_app/ui/account_page.dart';
+import 'package:final_app/sqlite/user.dart';
 
 class SignUP extends StatefulWidget {
   @override
@@ -13,6 +15,9 @@ class _SignUpState extends State<SignUP> {
   final TextEditingController _passwordController = TextEditingController();
   String? isExist;
   bool isLoading = false;
+
+  final _model = UserModel();
+  List<dynamic> allUsers = [];
 
 Future<void> checkAccountInFirebase(BuildContext context) async {
     setState(() {
@@ -49,6 +54,8 @@ Future<void> checkAccountInFirebase(BuildContext context) async {
 
         isExist = querySnapshot.docs.isNotEmpty.toString();
         if (isExist == "false") {
+          _addUser(username,password);
+          _readUser();
           await _firestore.collection('accounts').add({
             'username': username,
             'password': password,
@@ -64,6 +71,31 @@ Future<void> checkAccountInFirebase(BuildContext context) async {
           isLoading = false;
         });
       }
+    }
+
+  }
+
+  Future _addUser(String username, String password) async{
+      User newuser = User(id: null, username: username, password: password);
+      int insertedUser = await _model.insertUser(newuser);
+
+      if(insertedUser != null){
+       print("New User registered");
+      }
+
+
+    }
+
+  Future _readUser() async{
+    List users = await _model.getAllUsers();
+    setState(() {
+        allUsers = users;
+    });
+
+    print(' ');
+    print("All the Users: ");
+    for(User user in users){
+      print(user);
     }
   }
 

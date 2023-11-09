@@ -15,7 +15,7 @@ class User{
 
   Map<String, Object?> toMap(){
     return{
-      'id': this.id!,
+      'id': this.id,
       'username': this.username!,
       'password': this.password!
     };
