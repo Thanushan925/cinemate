@@ -13,8 +13,14 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
 
-  String? _isExist;
+  static String? _isExist;
   String? _username;
+
+  {
+    // TODO: implement print
+    print("********************* current isExist = ${_isExist} ***********************");
+    throw UnimplementedError();
+  }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
