@@ -26,6 +26,8 @@ class Cinema {
   final int id;
   final String name;
   final String address;
+  final double latitude;
+  final double longitude;
   final double distance;
   final List<Experience> experiences;
 
@@ -33,20 +35,33 @@ class Cinema {
     required this.id,
     required this.name,
     required this.address,
+    required this.latitude,
+    required this.longitude,
     required this.distance,
     required this.experiences,
   });
 
   factory Cinema.fromJson(Map<String, dynamic> json) {
     return Cinema(
-      id: json['id'] ?? 0, // Default value if null
-      name: json['name'] ?? 'Unknown', // Default value if null
-      address: "${json['address1'] ?? ''} ${json['city'] ?? ''}, ${json['provinceCode'] ?? ''}, ${json['postalCode'] ?? ''}".trim(),
-      distance: json['distance']?.toDouble() ?? 0.0, // Default value if null
-      experiences: (json['experiences'] as List<dynamic>?)
+      id: json['id'] as int? ?? 0, // Provide a default value of 0 if null
+      name: json['name'] as String? ?? 'Unknown', // Provide a default value if null
+      address: _buildAddress(json), // Call a separate function to build the address
+      latitude: (json['latitude'] as num?)?.toDouble() ?? 0.0, // Provide a default value if null
+      longitude: (json['longitude'] as num?)?.toDouble() ?? 0.0, // Provide a default value if null
+      distance: (json['distance'] as num?)?.toDouble() ?? 0.0, // Provide a default value if null
+      experiences: (json['experiences'] as List?)
           ?.map((e) => Experience.fromJson(e as Map<String, dynamic>))
-          .toList() ?? [], // Default value if null
+          .toList() ?? [], // Provide an empty list if null
     );
+  }
+
+  static String _buildAddress(Map<String, dynamic> json) {
+    return [
+      json['address1'],
+      json['city'],
+      json['provinceCode'],
+      json['postalCode']
+    ].where((element) => element != null && element.isNotEmpty).join(', ');
   }
 }
 
@@ -61,8 +76,8 @@ class Experience {
 
   factory Experience.fromJson(Map<String, dynamic> json) {
     return Experience(
-      title: json['title'] ?? 'Unknown Experience', // Default value if null
-      description: json['description'] ?? 'Description not available', // Default value if null
+      title: json['title'] as String? ?? 'Unknown Experience', // Provide a default value if null
+      description: json['description'] as String? ?? 'No description available', // Provide a default value if null
     );
   }
 }
