@@ -4,9 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import 'package:final_app/ui/account_page.dart';
+
+
 class LocalNotifications {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+  static bool showNotificationEnable = false;
 
   LocalNotifications() {
     initializeNotifications();
@@ -27,6 +31,7 @@ class LocalNotifications {
   Future<bool> requestNotificationPermission() async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.request();
+      AccountPageState.notificationEnabled = status == PermissionStatus.granted;
       return status == PermissionStatus.granted;
     }
     return true; // For iOS, permission is not required
@@ -46,13 +51,19 @@ class LocalNotifications {
       const NotificationDetails platformChannelSpecifics =
           NotificationDetails(android: androidPlatformChannelSpecifics);
 
-      await flutterLocalNotificationsPlugin.show(
-        0,
-        'Welcome to Cinemate!',
-        'Your mate for all your cinema needs.',
-        platformChannelSpecifics,
-        payload: 'item x',
-      );
+      print("current value = ${LocalNotifications.showNotificationEnable}***************************8");
+
+      if(showNotificationEnable)
+      {
+        print("enterssssssssssssssssssssssssssssss");
+        await flutterLocalNotificationsPlugin.show(
+          0,
+          'Welcome to Cinemate!',
+          'Your mate for all your cinema needs.',
+          platformChannelSpecifics,
+          payload: 'item x',
+        );
+      }
     }
   }
 }

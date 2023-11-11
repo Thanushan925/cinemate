@@ -2,21 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:final_app/firebase/sign_in.dart';
 import 'package:final_app/firebase/sign_up.dart';
 
+import 'package:final_app/ui/notifications.dart';
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
+
+
+
 class AccountPage extends StatefulWidget {
   String? message = '';
 
   AccountPage({required this.message});
 
   @override
-  _AccountPageState createState() => _AccountPageState();
+  AccountPageState createState() => AccountPageState();
 }
 
-class _AccountPageState extends State<AccountPage> {
+class AccountPageState extends State<AccountPage> {
 
   static String? _isExist;
   static String? _username;
+  static bool notificationEnabled = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // AccountPageState()
+  // {
+  //   initNotification();
+  // }
+
+  // void initNotification() async{
+  //   notificationEnabled = await LocalNotifications().requestNotificationPermission();
+  // }
 
   void _signOut() {
     setState(() {
@@ -62,6 +79,37 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
+  // notification alert
+  Future<void> _showNotificationPermissionDialog(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Alert"),
+          content: Text("Please allow notification settings in settings!"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // close the dialog
+                Navigator.of(context).pop(); 
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // close the dialog
+                Navigator.of(context).pop();
+                // open the app settings
+                openAppSettings();
+              },
+              child: Text("Settings"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,30 +127,119 @@ class _AccountPageState extends State<AccountPage> {
             ),
         ],
       ),
-      body: Center(
-        child: _isExist == 'true'
-            ? Text('Welcome')
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: Container(
+        color: Colors.grey[200], 
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // show only when _isExist is false or null
+            if (_isExist == 'false' || _isExist == null)  
+              Column(
                 children: [
                   ElevatedButton(
                     onPressed: () {
                       _navigateSignIn(context);
                     },
-                    child: Text('Sign In'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      alignment: Alignment.centerLeft,
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0),
+                      ),
+                      elevation: 0.0,                  
+                    ),
+                    child: Container(
+                      width: double.infinity, 
+                      child: Text(
+                        'Sign In',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black),
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: 8.0),
                   ElevatedButton(
                     onPressed: () {
                       _navigateSignUp(context);
                     },
-                    child: Text('Sign Up'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      alignment: Alignment.centerLeft,
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0.0),
+                      ),
+                      elevation: 0.0,                  
+                    ),
+                    child: Container(
+                      width: double.infinity, 
+                      child: Text(
+                        'Sign Up',
+                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black),
+                      ),
+                    ),
                   ),
                 ],
               ),
-      )
+            SizedBox(height: 8.0),
+            Container(
+              color: Colors.white,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    child: Text(
+                      'Enable Notifications',
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  Spacer(),
+                  Switch(
+                    value: notificationEnabled,
+                    onChanged: (value) async {
+                      final status = await Permission.notification.request();
+                      if (notificationEnabled == false && status != PermissionStatus.granted) {
+                        await _showNotificationPermissionDialog(context);
+                        
+                      } else {
+                        setState(() {
+                            LocalNotifications.showNotificationEnable = value;
+                            print("current value = ${LocalNotifications.showNotificationEnable}***************************8");
+                            notificationEnabled = value;
+                          });
+                      }
+                    },
+                    activeTrackColor: Colors.blue,
+                    activeColor: Colors.blue,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Container(
+              color: Colors.white,
+              child: Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    child: Text(
+                      'Version 1.0.0',
+                      style: TextStyle(fontSize: 16.0, color: Colors.grey),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
+
+
+
 }
 
 
