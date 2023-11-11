@@ -12,7 +12,9 @@ class CinemaMapPage extends StatefulWidget {
 class _CinemaMapPageState extends State<CinemaMapPage> {
   late Future<List<Cinema>> _cinemasFuture;
   List<Marker> _markers = [];
+  List<CircleMarker> _circleMarkers = [];
   MapController _mapController = MapController();
+  LatLng? _userLocation;
 
   @override
   void initState() {
@@ -38,14 +40,23 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
     if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
       try {
         var position = await Geolocator.getCurrentPosition();
-        _mapController.move(LatLng(position.latitude, position.longitude), 13);
+        setState(() {
+          _userLocation = LatLng(position.latitude, position.longitude);
+          _circleMarkers.add(CircleMarker(
+            point: _userLocation!,
+            color: Colors.blue.withOpacity(0.3),
+            borderStrokeWidth: 2,
+            borderColor: Colors.blue,
+            radius: 10, // Adjust radius size as needed
+          ));
+        });
+         _mapController.move(_userLocation!, 13);
       } catch (e) {
         print('Error getting user location: $e');
       }
     }
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,7 +85,7 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
             }).toList();
           }
 
-          LatLng center = _markers.isNotEmpty ? _markers.first.point : LatLng(0, 0);
+          LatLng center = _userLocation ?? LatLng(0, 0); // Use user location if available
 
           return FlutterMap(
             mapController: _mapController,
@@ -88,6 +99,7 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
                 subdomains: ['a', 'b', 'c'],
               ),
               MarkerLayer(markers: _markers),
+              CircleLayer(circles: (_circleMarkers)),
             ],
           );
 
