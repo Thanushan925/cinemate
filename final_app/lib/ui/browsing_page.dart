@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'movie_detail.dart';
 
 class Movie {
   final int id;
@@ -8,6 +9,11 @@ class Movie {
   final String runtime;
   final String releaseDate;
   final String smallPosterImageUrl;
+  final String? presentationType;
+  final String? marketLanguageCode;
+  final String? ratingDescription;
+  final String? warning;
+  final List<String>? formats;
 
   Movie({
     required this.id,
@@ -15,6 +21,11 @@ class Movie {
     required this.runtime,
     required this.releaseDate,
     required this.smallPosterImageUrl,
+    this.presentationType,
+    this.marketLanguageCode,
+    this.ratingDescription,
+    this.warning,
+    this.formats,
   });
 }
 
@@ -31,6 +42,11 @@ Future<List<Movie>> fetchMovies() async {
         runtime: movie['duration'] as String,
         releaseDate: movie['releaseDate'] as String,
         smallPosterImageUrl: movie['smallPosterImageUrl'] as String,
+        presentationType: movie['presentationType'] as String?,
+        marketLanguageCode: movie['marketLanguageCode'] as String?,
+        ratingDescription: movie['ratingDescription'] as String?,
+        warning: movie['warning'] as String?,
+        formats: List<String>.from(movie['formats'] ?? []),
       );
     }).toList();
 
@@ -144,6 +160,15 @@ class _BrowsingPageState extends State<BrowsingPage> {
                             Text('Release Date: $formattedDate'),
                           ],
                         ),
+                        onTap: () {
+                          // Navigate to the movie details page
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return MovieDetailPage(movie: movie);
+                            },
+                          );
+                        },
                       ),
                     );
                   },
