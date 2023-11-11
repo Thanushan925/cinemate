@@ -78,16 +78,22 @@ class _BrowsingPageState extends State<BrowsingPage> {
                   itemBuilder: (context, index) {
                     final movie = movies[index];
 
-                    return ListTile(
-                      leading: Image.network(movie.smallPosterImageUrl),
-                      title: Text(movie.name),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Runtime: ${movie.runtime}'),
-                          Text('Release Date: ${movie.releaseDate}'),
-                        ],
-                      ),
+                    DateTime releaseDateTime = DateTime.parse(movie.releaseDate);
+                    String formattedDate = "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ListTile(
+                        leading: Image.network(movie.smallPosterImageUrl),
+                        title: Text(movie.name),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Runtime: ${movie.runtime}'),
+                            Text('Release Date: $formattedDate'),
+                          ],
+                        ),
+                      )
                     );
                   },
                 );
