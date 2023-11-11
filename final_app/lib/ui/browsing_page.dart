@@ -30,7 +30,8 @@ class Movie {
 }
 
 Future<List<Movie>> fetchMovies() async {
-  final response = await http.get(Uri.parse('https://www.cineplex.com/api/v1/movies?language=en-us&marketLanguageCodeFq'));
+  final response = await http.get(Uri.parse(
+      'https://www.cineplex.com/api/v1/movies?language=en-us&marketLanguageCodeFq'));
 
   if (response.statusCode == 200) {
     final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
@@ -145,8 +146,10 @@ class _BrowsingPageState extends State<BrowsingPage> {
                   itemBuilder: (context, index) {
                     final movie = movies[index];
 
-                    DateTime releaseDateTime = DateTime.parse(movie.releaseDate);
-                    String formattedDate = "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+                    DateTime releaseDateTime =
+                        DateTime.parse(movie.releaseDate);
+                    String formattedDate =
+                        "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
 
                     return Padding(
                       padding: const EdgeInsets.all(10.0),

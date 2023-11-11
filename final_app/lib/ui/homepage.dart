@@ -9,6 +9,7 @@ class Movie {
   String? runtime;
   String? releaseDate;
   String? largePosterImageUrl;
+  String? presentationType;
 
   Movie({
     required this.id,
@@ -16,6 +17,7 @@ class Movie {
     required this.runtime,
     required this.releaseDate,
     required this.largePosterImageUrl,
+    required this.presentationType,
   });
 
   Movie.fromMap(Map map) {
@@ -24,6 +26,7 @@ class Movie {
     runtime = map['runtime'];
     releaseDate = map['releaseDate'];
     largePosterImageUrl = map['largePosterImageUrl'];
+    presentationType = map['presentationType'];
   }
 
   Map<String, Object?> toMap() {
@@ -32,12 +35,12 @@ class Movie {
       'name': this.name,
       'runtime': this.runtime,
       'releaseDate': this.releaseDate,
-      'largePosterImageUrl': this.largePosterImageUrl
+      'largePosterImageUrl': this.largePosterImageUrl,
     };
   }
 
   String toString() {
-    return "Movie id: $id, name: $name, runtime: $runtime, releas date: $releaseDate";
+    return "Movie id: $id, name: $name, runtime: $runtime, release date: $releaseDate, presentation type: $presentationType";
   }
 }
 
@@ -55,6 +58,7 @@ Future<List<Movie>> fetchMovies() async {
         runtime: movie['duration'] as String,
         releaseDate: movie['releaseDate'] as String,
         largePosterImageUrl: movie['largePosterImageUrl'] as String,
+        presentationType: movie['presentationType'] as String?,
       );
     }).toList();
 
@@ -131,7 +135,85 @@ class _HomeState extends State<Home> {
                         itemCount: movies.length,
                         itemBuilder: (context, index) {
                           final movie = movies[index];
-                          return GestureDetector(
+
+                          return Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(movie.name!),
+                                      actions: [
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                      content: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Image.network(
+                                            movie.largePosterImageUrl!,
+                                            width: 250,
+                                            height: 300,
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text('Runtime: ${movie.runtime}'),
+                                          Text(
+                                            'Release Date: ${movie.releaseDate}',
+                                          ),
+                                          Text(
+                                              'Presentation Type: ${movie.presentationType}'),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Column(
+                                children: [
+                                  Image.network(
+                                    movie.largePosterImageUrl!,
+                                    width: 200,
+                                    height: 250,
+                                  ),
+                                  SizedBox(height: 8.0),
+                                  Text(movie.name!),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Text(
+                      'All Movies',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: movies.length,
+                      itemBuilder: (context, index) {
+                        final movie = movies[index];
+
+                        DateTime releaseDateTime =
+                            DateTime.parse(movie.releaseDate!);
+                        String formattedDate =
+                            "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 8.0),
+                          child: ListTile(
                             onTap: () {
                               showDialog(
                                 context: context,
@@ -158,52 +240,24 @@ class _HomeState extends State<Home> {
                                         ),
                                         SizedBox(height: 20),
                                         Text('Runtime: ${movie.runtime}'),
+                                        Text('Release Date: $formattedDate'),
                                         Text(
-                                          'Release Date: ${movie.releaseDate}',
-                                        ),
+                                            'Presentation Type: ${movie.presentationType}'),
                                       ],
                                     ),
                                   );
                                 },
                               );
                             },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Image.network(
-                                    movie.largePosterImageUrl!,
-                                    width: 200,
-                                    height: 250,
-                                  ),
-                                  Text(movie.name!),
-                                ],
-                              ),
+                            leading: Image.network(movie.largePosterImageUrl!),
+                            title: Text(movie.name!),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Runtime: ${movie.runtime}'),
+                                Text('Release Date: $formattedDate'),
+                              ],
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                    Text(
-                      'All Movies',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: movies.length,
-                      itemBuilder: (context, index) {
-                        final movie = movies[index];
-                        return ListTile(
-                          leading: Image.network(movie.largePosterImageUrl!),
-                          title: Text(movie.name!),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Runtime: ${movie.runtime}'),
-                              Text('Release Date: ${movie.releaseDate}'),
-                            ],
                           ),
                         );
                       },
