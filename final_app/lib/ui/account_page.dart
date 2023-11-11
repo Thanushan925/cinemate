@@ -4,7 +4,6 @@ import 'package:final_app/firebase/sign_up.dart';
 
 import 'package:final_app/ui/notifications.dart';
 
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 
@@ -18,24 +17,86 @@ class AccountPage extends StatefulWidget {
   AccountPageState createState() => AccountPageState();
 }
 
-class AccountPageState extends State<AccountPage> {
-
+class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   static String? _isExist;
   static String? _username;
   static bool notificationEnabled = false;
+  static bool isAlertDialogShowing = false;
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  // AccountPageState()
-  // {
-  //   initNotification();
-  // }
 
-  // void initNotification() async{
-  //   notificationEnabled = await LocalNotifications().requestNotificationPermission();
-  // }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _checkNotificationPermission();
+  }
 
-  void _signOut() {
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+
+
+    if (state == AppLifecycleState.resumed && !isAlertDialogShowing) {
+      // This block will be executed when the app is resumed
+      print("Back to app");
+      _checkNotificationPermission();
+    }
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    var status = await Permission.notification.status;
+    setState(() {
+      notificationEnabled = status.isGranted;
+    });
+  }
+
+  // notification alert
+  Future<void> _showNotificationPermissionDialog(BuildContext context) async {
+    // Set the flag to true when the dialog is shown
+    isAlertDialogShowing = true;
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Alert"),
+          content: Text("Please allow notification settings in settings!"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // close the dialog
+                Navigator.of(context).pop();
+                // Set the flag back to false when the dialog is dismissed
+                isAlertDialogShowing = false;
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // close the dialog
+                Navigator.of(context).pop();
+                // open the app settings
+                openAppSettings();
+                // Set the flag back to false when the dialog is dismissed
+                isAlertDialogShowing = false;
+              },
+              child: Text("Settings"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+    void _signOut() {
     setState(() {
       _isExist = 'false';
       _username = '';
@@ -77,37 +138,6 @@ class AccountPageState extends State<AccountPage> {
         }
       });
     }
-  }
-
-  // notification alert
-  Future<void> _showNotificationPermissionDialog(BuildContext context) async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Alert"),
-          content: Text("Please allow notification settings in settings!"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // close the dialog
-                Navigator.of(context).pop(); 
-              },
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                // close the dialog
-                Navigator.of(context).pop();
-                // open the app settings
-                openAppSettings();
-              },
-              child: Text("Settings"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
 
@@ -206,7 +236,6 @@ class AccountPageState extends State<AccountPage> {
                       } else {
                         setState(() {
                             LocalNotifications.showNotificationEnable = value;
-                            print("current value = ${LocalNotifications.showNotificationEnable}***************************8");
                             notificationEnabled = value;
                           });
                       }

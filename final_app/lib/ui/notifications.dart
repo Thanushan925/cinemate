@@ -10,7 +10,7 @@ import 'package:final_app/ui/account_page.dart';
 class LocalNotifications {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  static bool showNotificationEnable = false;
+  static bool showNotificationEnable = true;
 
   LocalNotifications() {
     initializeNotifications();
@@ -31,8 +31,11 @@ class LocalNotifications {
   Future<bool> requestNotificationPermission() async {
     if (Platform.isAndroid) {
       final status = await Permission.notification.request();
+
+
       AccountPageState.notificationEnabled = status == PermissionStatus.granted;
       return status == PermissionStatus.granted;
+
     }
     return true; // For iOS, permission is not required
   }
