@@ -14,5 +14,6 @@ class DBUtils{
       version: 1,
     );
     print("Created DB $database");
+    return database;
   }
 }

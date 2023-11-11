@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:final_app/firebase/sign_in.dart';
 import 'package:final_app/firebase/sign_up.dart';
-
 import 'package:final_app/ui/notifications.dart';
-
 import 'package:permission_handler/permission_handler.dart';
-
-
+import 'package:final_app/sqlite/notif.dart';
 
 class AccountPage extends StatefulWidget {
   String? message = '';
@@ -22,16 +19,14 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   static String? _username;
   static bool notificationEnabled = false;
   static bool isAlertDialogShowing = false;
-
+  static bool alertSettingsClicked = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _checkNotificationPermission();
   }
 
   @override
@@ -43,9 +38,8 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
 
-
     if (state == AppLifecycleState.resumed && !isAlertDialogShowing) {
-      // This block will be executed when the app is resumed
+      // this block will be executed when the app is resumed
       print("Back to app");
       _checkNotificationPermission();
     }
@@ -53,14 +47,31 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
 
   Future<void> _checkNotificationPermission() async {
     var status = await Permission.notification.status;
-    setState(() {
-      notificationEnabled = status.isGranted;
-    });
+
+    if (status.isGranted && alertSettingsClicked) {
+      
+      print("enter check");
+
+      // perform asynchronous work without updating the widget state
+      Notifs newNotif = Notifs(notificationEnabled: notificationEnabled);
+      await LocalNotifications.model.updateAllNotif(newNotif);
+
+      alertSettingsClicked = false;
+
+      setState(() {
+        notificationEnabled = true; 
+      });
+    } 
+    else if(status.isDenied){
+      setState(() {
+        notificationEnabled = false;
+      });
+    }
   }
 
   // notification alert
   Future<void> _showNotificationPermissionDialog(BuildContext context) async {
-    // Set the flag to true when the dialog is shown
+    // set the flag to true when the dialog is shown
     isAlertDialogShowing = true;
 
     return showDialog(
@@ -74,7 +85,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
               onPressed: () {
                 // close the dialog
                 Navigator.of(context).pop();
-                // Set the flag back to false when the dialog is dismissed
+                // set the flag back to false when the dialog is dismissed
                 isAlertDialogShowing = false;
               },
               child: Text("Cancel"),
@@ -83,9 +94,13 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
               onPressed: () {
                 // close the dialog
                 Navigator.of(context).pop();
+
+                alertSettingsClicked = true;
+
                 // open the app settings
                 openAppSettings();
-                // Set the flag back to false when the dialog is dismissed
+
+                // set the flag back to false when the dialog is dismissed
                 isAlertDialogShowing = false;
               },
               child: Text("Settings"),
@@ -139,7 +154,6 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -232,12 +246,14 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                       final status = await Permission.notification.request();
                       if (notificationEnabled == false && status != PermissionStatus.granted) {
                         await _showNotificationPermissionDialog(context);
-                        
                       } else {
                         setState(() {
-                            LocalNotifications.showNotificationEnable = value;
-                            notificationEnabled = value;
-                          });
+                          LocalNotifications.isEnabled = value;
+                          notificationEnabled = value;
+
+                          Notifs newNotif = Notifs(notificationEnabled: value);
+                          LocalNotifications.model.updateAllNotif(newNotif);
+                        });
                       }
                     },
                     activeTrackColor: Colors.blue,
@@ -249,7 +265,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
             SizedBox(height: 8.0),
             Container(
               color: Colors.white,
-              child: Row(
+              child: const Row(
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
@@ -266,11 +282,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
       ),
     );
   }
-
-
-
 }
-
 
 void showSnackBar(String message, String isExist, BuildContext context) {
   SnackBar? snackBar;
