@@ -51,11 +51,33 @@ class BrowsingPage extends StatefulWidget {
 
 class _BrowsingPageState extends State<BrowsingPage> {
   late Future<List<Movie>> futureMovies;
+  TextEditingController searchController = TextEditingController();
+  List<Movie> filteredMovies = [];
+  bool isSearching = false;
 
   @override
   void initState() {
     super.initState();
     futureMovies = fetchMovies();
+  }
+
+  void filterMovies(String query) {
+    if (query.isEmpty) {
+      setState(() {
+        filteredMovies = [];
+        isSearching = false;
+      });
+    } else {
+      final lowercaseQuery = query.toLowerCase();
+      futureMovies.then((moviesList) {
+        setState(() {
+          isSearching = true;
+          filteredMovies = moviesList.where((movie) {
+            return movie.name.toLowerCase().contains(lowercaseQuery);
+          }).toList();
+        });
+      });
+    }
   }
 
   @override
@@ -64,14 +86,43 @@ class _BrowsingPageState extends State<BrowsingPage> {
       title: 'Movie List',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Movies'),
+          title: !isSearching
+              ? const Text('Movies')
+              : TextField(
+                  controller: searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      filterMovies(value);
+                    });
+                  },
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.search, color: Colors.white),
+                    hintText: "Search Movie Name",
+                    hintStyle: TextStyle(color: Colors.white),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                ),
+          actions: [
+            IconButton(
+              icon: Icon(isSearching ? Icons.cancel : Icons.search),
+              onPressed: () {
+                setState(() {
+                  isSearching = !isSearching;
+                  if (!isSearching) {
+                    searchController.clear();
+                    filterMovies('');
+                  }
+                });
+              },
+            ),
+          ],
         ),
         body: Center(
           child: FutureBuilder<List<Movie>>(
             future: futureMovies,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                final movies = snapshot.data!;
+                final movies = isSearching ? filteredMovies : snapshot.data!;
 
                 return ListView.builder(
                   itemCount: movies.length,
@@ -93,7 +144,7 @@ class _BrowsingPageState extends State<BrowsingPage> {
                             Text('Release Date: $formattedDate'),
                           ],
                         ),
-                      )
+                      ),
                     );
                   },
                 );
