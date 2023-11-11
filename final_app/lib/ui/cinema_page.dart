@@ -1,8 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:final_app/storage/api_cinema.dart';
 import 'cinema_detail.dart';
-import 'cinema_map.dart'; // Ensure this file is created with the correct content
+import 'cinema_map.dart';
 
 class CinemaPage extends StatefulWidget {
   @override
@@ -75,10 +74,12 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
           itemCount: cinemasToShow.length,
           itemBuilder: (context, index) {
             var cinema = cinemasToShow[index];
+            //double distance = calculateDistance(LatLng(cinema.latitude, cinema.longitude), _userLocation);
             return ListTile(
               leading: Icon(Icons.movie, color: Colors.yellow[700]),
               title: Text(cinema.name),
-              subtitle: Text('${cinema.address} - ${cinema.distance.toStringAsFixed(1)} km away'),
+              // Updated to show only the name and distance
+              subtitle: Text('${cinema.distance.toStringAsFixed(1)} km away'),
               onTap: () => navigateToCinemaDetail(cinema),
             );
           },

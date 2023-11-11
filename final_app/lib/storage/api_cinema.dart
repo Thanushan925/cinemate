@@ -2,9 +2,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+// A service class for fetching cinema data from an API.
 class ApiService {
   final String _baseUrl = 'https://www.cineplex.com/api/v1/theatres?language=en-us&range=100000&skip=0&take=1000';
 
+  //Fetches cinema information from the API
   Future<List<Cinema>> fetchCinemas() async {
     final response = await http.get(Uri.parse(_baseUrl), headers: {
       'Content-Type': 'application/json',
@@ -22,6 +24,7 @@ class ApiService {
   }
 }
 
+//A cinema class representation
 class Cinema {
   final int id;
   final String name;
@@ -55,6 +58,7 @@ class Cinema {
     );
   }
 
+  //a function to build the address from a map
   static String _buildAddress(Map<String, dynamic> json) {
     return [
       json['address1'],
@@ -65,6 +69,7 @@ class Cinema {
   }
 }
 
+//an experience class that seperate a long list of experiences for each cinema for easier access
 class Experience {
   final String title;
   final String description;
