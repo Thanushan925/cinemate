@@ -39,13 +39,13 @@ class UserModel{
     );
   }
 
-  Future<int> deleteUser(int id) async{
+  Future deleteUser(User user) async{
     final db = await UserDBUtils.init();
 
     return db.delete(
       'users_info',
       where: 'id = ?',
-      whereArgs: [id],
+      whereArgs: [user.id],
     );
   }
 }
