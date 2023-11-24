@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' as LatLng;
 import 'package:final_app/storage/api_cinema.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:location/location.dart' as Location;
+import 'package:location/location.dart';
+import 'dart:io';
 
 class CinemaMapPage extends StatefulWidget {
   @override
@@ -10,58 +14,96 @@ class CinemaMapPage extends StatefulWidget {
 }
 
 class _CinemaMapPageState extends State<CinemaMapPage> {
-  late Future<List<Cinema>> _cinemasFuture;
-  List<Marker> _markers = [];
-  List<CircleMarker> _circleMarkers = [];
-  MapController _mapController = MapController();
-  LatLng? _userLocation;
+  late MapController _mapController;
+  LatLng.LatLng _userLocation = LatLng.LatLng(0, 0);
 
   @override
   void initState() {
     super.initState();
-    _cinemasFuture = ApiService().fetchCinemas();
+    _mapController = MapController();
+    Location.Location location = Location.Location();
     _getUserLocation();
   }
-
   void _getUserLocation() async {
-    var serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return;
-    }
-
-    var permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return;
+    try {
+      Location.Location location = Location.Location();
+      bool serviceEnabled = await location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await location.requestService();
+        if (!serviceEnabled) {
+          return;
+        }
       }
-    }
 
-    if (permission == LocationPermission.whileInUse || permission == LocationPermission.always) {
-      try {
-        var position = await Geolocator.getCurrentPosition();
-        setState(() {
-          _userLocation = LatLng(position.latitude, position.longitude);
-          _circleMarkers.add(CircleMarker(
-            point: _userLocation!,
-            color: Colors.blue.withOpacity(0.3),
-            borderStrokeWidth: 2,
-            borderColor: Colors.blue,
-            radius: 10, // Adjust radius size as needed
-          ));
-        });
-         _mapController.move(_userLocation!, 13);
-      } catch (e) {
-        print('Error getting user location: $e');
+      PermissionStatus permissionStatus = await location.hasPermission();
+      if (permissionStatus == PermissionStatus.denied) {
+        permissionStatus = await location.requestPermission();
+        if (permissionStatus != PermissionStatus.granted) {
+          return;
+        }
       }
+
+      await _loadUserLocation();
+    } catch (e) {
+      print('Error getting user location: $e');
+      // Implement retry logic here if needed
     }
   }
+
+  Future<void> _loadUserLocation() async {
+    try {
+      Location.LocationData currentLocation = await Location.Location().getLocation();
+      setState(() {
+        _userLocation = LatLng.LatLng(
+          currentLocation.latitude!,
+          currentLocation.longitude!,
+        );
+      });
+
+      _mapController.move(_userLocation, 13.0);
+    } on SocketException catch (e) {
+      print('SocketException: $e');
+      // Implement retry logic here if needed
+    } catch (e) {
+      print('Error loading user location: $e');
+    }
+  }
+  // void _getUserLocation() async {
+  //   try {
+  //     Location.Location location = Location.Location();
+  //     bool serviceEnabled = await location.serviceEnabled();
+  //     if (!serviceEnabled) {
+  //       serviceEnabled = await location.requestService();
+  //       if (!serviceEnabled) {
+  //         return;
+  //       }
+  //     }
+  //
+  //     PermissionStatus permissionStatus = await location.hasPermission();
+  //     if (permissionStatus == PermissionStatus.denied) {
+  //       permissionStatus = await location.requestPermission();
+  //       if (permissionStatus != PermissionStatus.granted) {
+  //         return;
+  //       }
+  //     }
+  //
+  //     Location.LocationData currentLocation = await location.getLocation();
+  //     setState(() {
+  //       _userLocation = LatLng.LatLng(
+  //           currentLocation.latitude!, currentLocation.longitude!);
+  //     });
+  //
+  //     _mapController.move(_userLocation, 13.0);
+  //   } catch (e) {
+  //     print('Error getting user location: $e');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<List<Cinema>>(
-        future: _cinemasFuture,
+        future: ApiService().fetchCinemas(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -71,40 +113,50 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
             return Center(child: Text('No cinemas found.'));
           }
 
-          //Clear existing markers when new data is available
-          if (snapshot.hasData) {
-            _markers = snapshot.data!.map((cinema) {
-              return Marker(
-                width: 80.0,
-                height: 80.0,
-                point: LatLng(cinema.latitude, cinema.longitude),
-                child: Container(
-                  child: Icon(Icons.location_on, color: Colors.red),
-                ),
-              );
-            }).toList();
-          }
-
-          LatLng center = _userLocation ?? LatLng(0, 0); // Use user location if available
+          List<Marker> markers = snapshot.data!.map((cinema) {
+            return Marker(
+              width: 80.0,
+              height: 80.0,
+              point: LatLng.LatLng(cinema.latitude, cinema.longitude),
+              child:  Container(
+                child: Icon(Icons.location_on, color: Colors.red),
+              ),
+            );
+          }).toList();
 
           return FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              center: center,
+              center: _userLocation,
               zoom: 13.0,
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                subdomains: ['a', 'b', 'c'],
+                urlTemplate:
+                'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+                additionalOptions: {
+                  'accessToken': 'pk.eyJ1IjoiZ2FiYnktdiIsImEiOiJjbHBiZjM3ajYwZXI4Mmpwa2hpNGk1dG9hIn0.kqoF2-KAvZA5HNm7xoYXGw',
+                  'id': 'mapbox/streets-v11',
+                },
               ),
-              MarkerLayer(markers: _markers),
-              CircleLayer(circles: (_circleMarkers)),
+              CircleLayer(
+                circles: [
+                  CircleMarker(
+                    point: _userLocation,
+                    color: Colors.blue.withOpacity(0.3),
+                    borderStrokeWidth: 2,
+                    borderColor: Colors.blue,
+                    radius: 10,
+                  ),
+                ],
+              ),
+              MarkerLayer(markers: markers),
             ],
           );
-
         },
       ),
     );
   }
 }
+
+
