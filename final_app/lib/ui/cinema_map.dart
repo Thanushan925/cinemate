@@ -24,6 +24,7 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
     Location.Location location = Location.Location();
     _getUserLocation();
   }
+
   void _getUserLocation() async {
     try {
       Location.Location location = Location.Location();
@@ -52,7 +53,8 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
 
   Future<void> _loadUserLocation() async {
     try {
-      Location.LocationData currentLocation = await Location.Location().getLocation();
+      Location.LocationData currentLocation =
+          await Location.Location().getLocation();
       setState(() {
         _userLocation = LatLng.LatLng(
           currentLocation.latitude!,
@@ -118,7 +120,7 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
               width: 80.0,
               height: 80.0,
               point: LatLng.LatLng(cinema.latitude, cinema.longitude),
-              child:  Container(
+              child: Container(
                 child: Icon(Icons.location_on, color: Colors.red),
               ),
             );
@@ -133,9 +135,10 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
             children: [
               TileLayer(
                 urlTemplate:
-                'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+                    'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
                 additionalOptions: {
-                  'accessToken': 'pk.eyJ1IjoiZ2FiYnktdiIsImEiOiJjbHBiZjM3ajYwZXI4Mmpwa2hpNGk1dG9hIn0.kqoF2-KAvZA5HNm7xoYXGw',
+                  'accessToken':
+                      'pk.eyJ1IjoidmVkYW50Y29kZXMiLCJhIjoiY2xwYzdrYnBhMGt1ajJpcHBoMWNpeWtjdSJ9.LADgYrweIsFjr6At2oP22w',
                   'id': 'mapbox/streets-v11',
                 },
               ),
@@ -158,5 +161,3 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
     );
   }
 }
-
-
