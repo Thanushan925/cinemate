@@ -32,6 +32,8 @@ class Cinema {
   final double longitude;
   final double distance;
   final List<Experience> experiences;
+  final String? mobileMapImageUrl; // Add this property
+  final String? mobileBackgroundImageUrl; // Add this property
 
   Cinema({
     required this.id,
@@ -41,6 +43,8 @@ class Cinema {
     required this.longitude,
     required this.distance,
     required this.experiences,
+    this.mobileMapImageUrl, // Update the constructor to include these properties
+    this.mobileBackgroundImageUrl,
   });
 
   factory Cinema.fromJson(Map<String, dynamic> json) {
@@ -54,6 +58,8 @@ class Cinema {
       experiences: (json['experiences'] as List?)
           ?.map((e) => Experience.fromJson(e as Map<String, dynamic>))
           .toList() ?? [], // Provide an empty list if null
+      mobileMapImageUrl: json['mobileMapImageUrl'] as String?, // Add these lines
+      mobileBackgroundImageUrl: json['mobileBackgroundImageUrl'] as String?, // Add these lines
     );
   }
 

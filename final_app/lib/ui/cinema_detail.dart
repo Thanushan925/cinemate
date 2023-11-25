@@ -30,7 +30,28 @@ class CinemaDetailPage extends StatelessWidget {
               title: Text(experience.title),
               subtitle: Text(experience.description),
             )).toList(),
-            // Optionally, add more widgets to display other details
+            SizedBox(height: 20),
+            Text(
+              'Location:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            cinema.mobileMapImageUrl != null
+                ? Image.network(
+              cinema.mobileMapImageUrl!,
+              fit: BoxFit.cover, // Use BoxFit.cover to display the full image
+            )
+                : Text('Image not available'),
+            SizedBox(height: 20),
+            Text(
+              'Background:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            cinema.mobileBackgroundImageUrl != null
+                ? Image.network(
+              cinema.mobileBackgroundImageUrl!,
+              fit: BoxFit.cover, // Use BoxFit.cover to display the full image
+            )
+                : Text('Image not available'),
           ],
         ),
       ),

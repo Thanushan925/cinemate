@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:final_app/storage/api_cinema.dart';
 import 'cinema_detail.dart';
 import 'cinema_map.dart';
+import 'package:latlong2/latlong.dart' as LatLng;
+import 'dart:math';
+// import 'package:location/location.dart' as Location;
+import 'package:geolocator/geolocator.dart';
 
 class CinemaPage extends StatefulWidget {
   @override
@@ -14,12 +18,30 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
   TextEditingController searchController = TextEditingController();
   List<Cinema> filteredCinemas = [];
   bool isSearching = false;
+  LatLng.LatLng? _userLocation; // Define _userLocation here
 
   @override
   void initState() {
     super.initState();
     cinemas = ApiService().fetchCinemas();
     _tabController = TabController(length: 2, vsync: this);
+    _getUserLocation(); // Call the function to get user location
+  }
+  void _getUserLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _userLocation = LatLng.LatLng(
+          position.latitude,
+          position.longitude,
+        );
+      });
+    } catch (e) {
+      print('Error getting user location: $e');
+    }
   }
 
   void filterCinemas(String query) {
@@ -70,16 +92,44 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
         }
 
         final cinemasToShow = isSearching ? filteredCinemas : snapshot.data!;
+
+        // Sort cinemas by distance
+        cinemasToShow.sort((cinema1, cinema2) {
+          double distance1 = _userLocation != null
+              ? calculateDistance(
+            LatLng.LatLng(cinema1.latitude, cinema1.longitude),
+            _userLocation!,
+          )
+              : double.infinity;
+
+          double distance2 = _userLocation != null
+              ? calculateDistance(
+            LatLng.LatLng(cinema2.latitude, cinema2.longitude),
+            _userLocation!,
+          )
+              : double.infinity;
+          return distance1.compareTo(distance2);
+        });
+
         return ListView.builder(
           itemCount: cinemasToShow.length,
           itemBuilder: (context, index) {
             var cinema = cinemasToShow[index];
+            double distance = _userLocation != null
+                ? calculateDistance(
+              LatLng.LatLng(cinema.latitude, cinema.longitude),
+              _userLocation!,
+            )
+                : 0.0;
             //double distance = calculateDistance(LatLng(cinema.latitude, cinema.longitude), _userLocation);
             return ListTile(
               leading: Icon(Icons.movie, color: Colors.yellow[700]),
               title: Text(cinema.name),
-              // Updated to show only the name and distance
-              subtitle: Text('${cinema.distance.toStringAsFixed(1)} km away'),
+              subtitle: Text(
+                distance > 0
+                    ? '${distance.toStringAsFixed(1)} km away'
+                    : 'Distance not available',
+              ),
               onTap: () => navigateToCinemaDetail(cinema),
             );
           },
@@ -139,4 +189,24 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
       ),
     );
   }
+}
+
+double calculateDistance(LatLng.LatLng point1, LatLng.LatLng point2) {
+  const double earthRadius = 6371.0; // Radius of the Earth in kilometers
+
+  double radians(double degree) {
+    return degree * (pi / 180.0);
+  }
+
+  double dLat = radians(point2.latitude - point1.latitude);
+  double dLon = radians(point2.longitude - point1.longitude);
+
+  double a = sin(dLat / 2) * sin(dLat / 2) +
+      cos(radians(point1.latitude)) * cos(radians(point2.latitude)) * sin(dLon / 2) * sin(dLon / 2);
+
+  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+  double distance = earthRadius * c;
+
+  return distance;
 }
