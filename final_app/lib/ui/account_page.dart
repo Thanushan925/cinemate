@@ -4,6 +4,7 @@ import 'package:final_app/firebase/sign_up.dart';
 import 'package:final_app/ui/notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:final_app/sqlite/notif.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 class AccountPage extends StatefulWidget {
   String? message = '';
@@ -37,7 +38,6 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-
     if (state == AppLifecycleState.resumed && !isAlertDialogShowing) {
       // this block will be executed when the app is resumed
       print("Back to app");
@@ -49,7 +49,6 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     var status = await Permission.notification.status;
 
     if (status.isGranted && alertSettingsClicked) {
-      
       print("enter check");
 
       // perform asynchronous work without updating the widget state
@@ -59,10 +58,9 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
       alertSettingsClicked = false;
 
       setState(() {
-        notificationEnabled = true; 
+        notificationEnabled = true;
       });
-    } 
-    else if(status.isDenied){
+    } else if (status.isDenied) {
       setState(() {
         notificationEnabled = false;
       });
@@ -111,7 +109,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     );
   }
 
-    void _signOut() {
+  void _signOut() {
     setState(() {
       _isExist = 'false';
       _username = '';
@@ -129,8 +127,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
         _isExist = result['isExist'];
         _username = result['username'];
 
-        if (_isExist == 'true') 
-        {
+        if (_isExist == 'true') {
           showSnackBar("Sign In Successful.", _isExist!, context);
         }
       });
@@ -147,8 +144,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
       setState(() {
         _isExist = result['isExist'];
 
-        if (_isExist == 'false') 
-        {
+        if (_isExist == 'false') {
           showSnackBar("Sign up Successful.", 'true', context);
         }
       });
@@ -160,7 +156,9 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: _isExist == 'true' ? Text('Welcome $_username') : Text('Account Page'),
+        title: _isExist == 'true'
+            ? Text('Welcome $_username')
+            : Text('Account Page'),
         actions: <Widget>[
           if (_isExist == 'true')
             IconButton(
@@ -169,15 +167,21 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                 _signOut();
               },
             ),
+          IconButton(
+            icon: Icon(Icons.lightbulb_outline),
+            onPressed: () {
+              ThemeProvider.controllerOf(context).nextTheme();
+            },
+          ),
         ],
       ),
       body: Container(
-        color: Colors.grey[200], 
+        color: Colors.grey[200],
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // show only when _isExist is false or null
-            if (_isExist == 'false' || _isExist == null)  
+            if (_isExist == 'false' || _isExist == null)
               Column(
                 children: [
                   ElevatedButton(
@@ -185,20 +189,24 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                       _navigateSignIn(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 16.0),
                       alignment: Alignment.centerLeft,
                       foregroundColor: Colors.black,
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(0.0),
                       ),
-                      elevation: 0.0,                  
+                      elevation: 0.0,
                     ),
                     child: Container(
-                      width: double.infinity, 
+                      width: double.infinity,
                       child: Text(
                         'Sign In',
-                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black),
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
                   ),
@@ -208,20 +216,24 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                       _navigateSignUp(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.0, vertical: 16.0),
                       alignment: Alignment.centerLeft,
                       foregroundColor: Colors.black,
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(0.0),
                       ),
-                      elevation: 0.0,                  
+                      elevation: 0.0,
                     ),
                     child: Container(
-                      width: double.infinity, 
+                      width: double.infinity,
                       child: Text(
                         'Sign Up',
-                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black),
+                        style: TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black),
                       ),
                     ),
                   ),
@@ -233,10 +245,14 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
               child: Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                     child: Text(
                       'Enable Notifications',
-                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.black),
+                      style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
                     ),
                   ),
                   Spacer(),
@@ -244,7 +260,8 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                     value: notificationEnabled,
                     onChanged: (value) async {
                       final status = await Permission.notification.request();
-                      if (notificationEnabled == false && status != PermissionStatus.granted) {
+                      if (notificationEnabled == false &&
+                          status != PermissionStatus.granted) {
                         await _showNotificationPermissionDialog(context);
                       } else {
                         setState(() {
@@ -268,7 +285,8 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
               child: const Row(
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                     child: Text(
                       'Version 1.0.0',
                       style: TextStyle(fontSize: 16.0, color: Colors.grey),

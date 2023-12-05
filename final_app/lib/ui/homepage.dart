@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:theme_provider/theme_provider.dart';
 
 class Movie {
   int? id;
@@ -111,6 +112,14 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.lightbulb_outline),
+            onPressed: () {
+              ThemeProvider.controllerOf(context).nextTheme();
+            },
+          ),
+        ],
       ),
       body: Center(
         child: FutureBuilder<List<Movie>>(
