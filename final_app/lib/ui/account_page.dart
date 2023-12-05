@@ -4,7 +4,6 @@ import 'package:final_app/firebase/sign_up.dart';
 import 'package:final_app/ui/notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:final_app/sqlite/notif.dart';
-import 'package:theme_provider/theme_provider.dart';
 
 class AccountPage extends StatefulWidget {
   String? message = '';
@@ -77,7 +76,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Alert"),
-          content: Text("Please allow notification settings in settings!"),
+          content: Text("Please allow notification settings in Account!"),
           actions: [
             TextButton(
               onPressed: () {
@@ -167,12 +166,6 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                 _signOut();
               },
             ),
-          IconButton(
-            icon: Icon(Icons.lightbulb_outline),
-            onPressed: () {
-              ThemeProvider.controllerOf(context).nextTheme();
-            },
-          ),
         ],
       ),
       body: Container(
@@ -275,6 +268,105 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                     },
                     activeTrackColor: Colors.blue,
                     activeColor: Colors.blue,
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              color: Colors.white,
+              child: Row(
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+                    child: Text(
+                      'Terms and Conditions',
+                      style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              actions: [
+                                IconButton(
+                                  icon: Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                              title: Text('Privacy Policy'),
+                              content: RichText(
+                                  text: TextSpan(
+                                      style: DefaultTextStyle.of(context).style,
+                                      children: <TextSpan>[
+                                    TextSpan(
+                                      text: 'Acceptance of Terms',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '\n\nBy downloading, installing, or using the '
+                                          '"Cinemate" mobile application, you agree '
+                                          'to comply with and be bound by the following '
+                                          'terms and conditions.',
+                                    ),
+                                    TextSpan(
+                                      text: '\n\nUser Conduct',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '\n\nTo access certain features of the App, '
+                                          'you may be required to create a user account. '
+                                          'You agree to provide accurate and complete '
+                                          'information during the registration process. ',
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '\n\nYou agree not to use the App for any unlawful or prohibited purpose. Unauthorized access or use of the App is strictly prohibited.',
+                                    ),
+                                    TextSpan(
+                                      text: '\n\nData Accuracy:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '\n\nWhile we strive to provide accurate and up-to-date information, we do not guarantee the accuracy, completeness, or reliability of any content within the App.',
+                                    ),
+                                    TextSpan(
+                                      text: '\n\nIntellectual Property:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '\n\nAll content, trademarks, and intellectual property rights in the App are the property of Cinemate or its licensors. You may not reproduce, distribute, or create derivative works without our explicit permission.',
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '\n\nNotifications and Recommendations:',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          '\n\nBy using the App, you may receive notifications and personalized recommendations based on your activity. You can manage notification settings within the App.',
+                                    ),
+                                  ])),
+                            );
+                          });
+                    },
+                    child: Icon(Icons.storage),
                   ),
                 ],
               ),
