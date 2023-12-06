@@ -155,9 +155,8 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: _isExist == 'true'
-            ? Text('Welcome $_username')
-            : Text('Account Page'),
+        title:
+            _isExist == 'true' ? Text('Welcome $_username') : Text('Account'),
         actions: <Widget>[
           if (_isExist == 'true')
             IconButton(
@@ -287,8 +286,8 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                           color: Colors.black),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
+                  ElevatedButton(
+                    onPressed: () {
                       showDialog(
                           context: context,
                           builder: (BuildContext context) {
@@ -366,14 +365,18 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                             );
                           });
                     },
-                    child: Icon(Icons.storage),
+                    child: Icon(Icons.info, color: Colors.blueGrey),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.white, // Set transparent background
+                      padding: const EdgeInsets.only(right: 0),
+                    ),
                   ),
                 ],
               ),
             ),
             SizedBox(height: 8.0),
             Container(
-              color: Colors.white,
+              // color: Colors.white,
               child: const Row(
                 children: [
                   Padding(

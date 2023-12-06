@@ -12,7 +12,8 @@ class CinemaPage extends StatefulWidget {
   _CinemaPageState createState() => _CinemaPageState();
 }
 
-class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateMixin {
+class _CinemaPageState extends State<CinemaPage>
+    with SingleTickerProviderStateMixin {
   late Future<List<Cinema>> cinemas;
   late TabController _tabController;
   TextEditingController searchController = TextEditingController();
@@ -27,6 +28,7 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
     _tabController = TabController(length: 2, vsync: this);
     _getUserLocation(); // Call the function to get user location
   }
+
   void _getUserLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
@@ -97,16 +99,16 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
         cinemasToShow.sort((cinema1, cinema2) {
           double distance1 = _userLocation != null
               ? calculateDistance(
-            LatLng.LatLng(cinema1.latitude, cinema1.longitude),
-            _userLocation!,
-          )
+                  LatLng.LatLng(cinema1.latitude, cinema1.longitude),
+                  _userLocation!,
+                )
               : double.infinity;
 
           double distance2 = _userLocation != null
               ? calculateDistance(
-            LatLng.LatLng(cinema2.latitude, cinema2.longitude),
-            _userLocation!,
-          )
+                  LatLng.LatLng(cinema2.latitude, cinema2.longitude),
+                  _userLocation!,
+                )
               : double.infinity;
           return distance1.compareTo(distance2);
         });
@@ -117,9 +119,9 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
             var cinema = cinemasToShow[index];
             double distance = _userLocation != null
                 ? calculateDistance(
-              LatLng.LatLng(cinema.latitude, cinema.longitude),
-              _userLocation!,
-            )
+                    LatLng.LatLng(cinema.latitude, cinema.longitude),
+                    _userLocation!,
+                  )
                 : 0.0;
             //double distance = calculateDistance(LatLng(cinema.latitude, cinema.longitude), _userLocation);
             return ListTile(
@@ -145,19 +147,19 @@ class _CinemaPageState extends State<CinemaPage> with SingleTickerProviderStateM
         title: !isSearching
             ? Text('Cinemas')
             : TextField(
-          controller: searchController,
-          onChanged: (value) {
-            setState(() {
-              filterCinemas(value);
-            });
-          },
-          decoration: InputDecoration(
-            icon: Icon(Icons.search, color: Colors.white),
-            hintText: "Search Cinema Name",
-            hintStyle: TextStyle(color: Colors.white),
-          ),
-          style: TextStyle(color: Colors.white),
-        ),
+                controller: searchController,
+                onChanged: (value) {
+                  setState(() {
+                    filterCinemas(value);
+                  });
+                },
+                decoration: InputDecoration(
+                  icon: Icon(Icons.search, color: Colors.white),
+                  hintText: "Search Cinema Name",
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
+                style: TextStyle(color: Colors.white),
+              ),
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -202,7 +204,10 @@ double calculateDistance(LatLng.LatLng point1, LatLng.LatLng point2) {
   double dLon = radians(point2.longitude - point1.longitude);
 
   double a = sin(dLat / 2) * sin(dLat / 2) +
-      cos(radians(point1.latitude)) * cos(radians(point2.latitude)) * sin(dLon / 2) * sin(dLon / 2);
+      cos(radians(point1.latitude)) *
+          cos(radians(point2.latitude)) *
+          sin(dLon / 2) *
+          sin(dLon / 2);
 
   double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
