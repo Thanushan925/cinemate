@@ -128,6 +128,23 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Define a helper function to check if a movie is an IMAX experience
+  bool isIMAXExperience(Movie movie) {
+    return movie.name!.toLowerCase().contains('imax');
+  }
+
+  // Define a helper function to check if a movie is in a language other than English
+  bool isOtherLanguage(Movie movie) {
+    return movie.marketLanguageCode != 'EN';
+  }
+
+  // Define a helper function to check if a movie is new this month
+  bool isNewThisMonth(Movie movie) {
+    DateTime releaseDateTime = DateTime.parse(movie.releaseDate!);
+    DateTime today = DateTime.now();
+    return releaseDateTime.isAfter(DateTime(today.year, today.month, 1));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -158,18 +175,25 @@ class _HomeState extends State<Home> {
                 Duration difference = today.difference(releaseDateTime);
                 return difference.inDays <= 21 && difference.inDays >= 0;
               }).toList();
+
+              // Separate movies into English and non-English categories
               List<Movie> englishMovies = movies
                   .where((movie) => movie.marketLanguageCode == 'EN')
                   .toList();
+              List<Movie> nonEnglishMovies = movies
+                  .where((movie) => movie.marketLanguageCode != 'EN')
+                  .toList();
+
+              // Sort English movies by popularity (based on available formats)
+              englishMovies.sort((a, b) => b.formats!.length.compareTo(a.formats!.length));
 
               return SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
                     SizedBox(height: 12),
                     Text(
-                      'Language: English',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      'Popular Movies',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 20), // Add some space here
                     Container(
@@ -179,15 +203,11 @@ class _HomeState extends State<Home> {
                         itemCount: englishMovies.length,
                         itemBuilder: (context, index) {
                           final movie = englishMovies[index];
-
-                          DateTime releaseDateTime =
-                              DateTime.parse(movie.releaseDate!);
-                          String formattedDate =
-                              "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+                          DateTime releaseDateTime = DateTime.parse(movie.releaseDate!);
+                          String formattedDate = "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
 
                           return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
                             child: GestureDetector(
                               onTap: () {
                                 showDialog(
@@ -253,85 +273,267 @@ class _HomeState extends State<Home> {
                         },
                       ),
                     ),
-                    Text(
-                      'Currently Playing',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+
+                    const ListTile(
+                      title: Text('New This Month', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     ),
                     ListView.builder(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
-                      itemCount: movies.length,
+                      itemCount: englishMovies.length,
                       itemBuilder: (context, index) {
-                        final movie = movies[index];
+                        final movie = englishMovies[index];
 
-                        DateTime releaseDateTime =
-                            DateTime.parse(movie.releaseDate!);
-                        String formattedDate =
-                            "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+                        // Check if the movie is new this month
+                        bool isNewMonth = isNewThisMonth(movie);
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 8.0),
-                          child: ListTile(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text(movie.name!),
-                                    actions: [
-                                      IconButton(
-                                        icon: Icon(Icons.close),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                    content: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Image.network(
-                                          movie.largePosterImageUrl!,
-                                          width: 250,
-                                          height: 300,
-                                        ),
-                                        SizedBox(height: 20),
-                                        Text('Runtime: ${movie.runtime}'),
-                                        Text('Release Date: $formattedDate'),
-                                        Text(
-                                          'Presentation Type: ${movie.presentationType}',
-                                        ),
-                                        Text(
-                                          'Market Language: ${movie.marketLanguageCode}',
-                                        ),
-                                        Text(
-                                          'Rating Description: ${movie.ratingDescription ?? 'N/A'}',
-                                        ),
-                                        Text(
-                                          'Warning: ${movie.warning ?? 'N/A'}',
-                                        ),
-                                        Text(
-                                            'Formats: ${movie.formats?.join(', ') ?? 'N/A'}'),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            leading: Image.network(movie.largePosterImageUrl!),
-                            title: Text(movie.name!),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('Runtime: ${movie.runtime}'),
-                                Text('Release Date: $formattedDate'),
-                              ],
+                        if (isNewMonth) {
+                          DateTime releaseDateTime = DateTime.parse(movie.releaseDate!);
+                          String formattedDate =
+                              "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 8.0,
                             ),
-                          ),
-                        );
+                            child: ListTile(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(movie.name!),
+                                      actions: [
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                      content: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Image.network(
+                                            movie.largePosterImageUrl!,
+                                            width: 250,
+                                            height: 300,
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text('Runtime: ${movie.runtime}'),
+                                          Text('Release Date: $formattedDate'),
+                                          Text(
+                                            'Presentation Type: ${movie.presentationType}',
+                                          ),
+                                          Text(
+                                            'Market Language: ${movie.marketLanguageCode}',
+                                          ),
+                                          Text(
+                                            'Rating Description: ${movie.ratingDescription ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                            'Warning: ${movie.warning ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                              'Formats: ${movie.formats?.join(', ') ?? 'N/A'}'),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              leading: Image.network(movie.largePosterImageUrl!),
+                              title: Text(movie.name!),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Runtime: ${movie.runtime}'),
+                                  Text('Release Date: $formattedDate'),
+                                ],
+                              ),
+                            ),
+                          );
+                        } else {
+                          return SizedBox.shrink(); // Skip this item if it's not new this month
+                        }
+                      },
+                    ),
+
+                    const ListTile(
+                      title: Text('IMAX Experiences', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: englishMovies.length,
+                      itemBuilder: (context, index) {
+                        final movie = englishMovies[index];
+
+                        // Check if the movie is an IMAX experience
+                        bool isIMAX = isIMAXExperience(movie);
+
+                        if (isIMAX) {
+                          DateTime releaseDateTime = DateTime.parse(movie.releaseDate!);
+                          String formattedDate =
+                              "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 8.0,
+                            ),
+                            child: ListTile(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(movie.name!),
+                                      actions: [
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                      content: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Image.network(
+                                            movie.largePosterImageUrl!,
+                                            width: 250,
+                                            height: 300,
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text('Runtime: ${movie.runtime}'),
+                                          Text('Release Date: $formattedDate'),
+                                          Text(
+                                            'Presentation Type: ${movie.presentationType}',
+                                          ),
+                                          Text(
+                                            'Market Language: ${movie.marketLanguageCode}',
+                                          ),
+                                          Text(
+                                            'Rating Description: ${movie.ratingDescription ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                            'Warning: ${movie.warning ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                              'Formats: ${movie.formats?.join(', ') ?? 'N/A'}'),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              leading: Image.network(movie.largePosterImageUrl!),
+                              title: Text(movie.name!),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Runtime: ${movie.runtime}'),
+                                  Text('Release Date: $formattedDate'),
+                                ],
+                              ),
+                            ),
+                          );
+                        } else {
+                          return SizedBox.shrink(); // Skip this item if it's not an IMAX experience
+                        }
+                      },
+                    ),
+
+                    const ListTile(
+                      title: Text('Tired of English?', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: nonEnglishMovies.length,
+                      itemBuilder: (context, index) {
+                        final movie = nonEnglishMovies[index];
+
+                        // Check if the movie is in a language other than English
+                        bool isOtherLang = isOtherLanguage(movie);
+
+                        if (isOtherLang) {
+                          DateTime releaseDateTime = DateTime.parse(movie.releaseDate!);
+                          String formattedDate =
+                              "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 8.0,
+                            ),
+                            child: ListTile(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text(movie.name!),
+                                      actions: [
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                      content: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Image.network(
+                                            movie.largePosterImageUrl!,
+                                            width: 250,
+                                            height: 300,
+                                          ),
+                                          SizedBox(height: 20),
+                                          Text('Runtime: ${movie.runtime}'),
+                                          Text('Release Date: $formattedDate'),
+                                          Text(
+                                            'Presentation Type: ${movie.presentationType}',
+                                          ),
+                                          Text(
+                                            'Market Language: ${movie.marketLanguageCode}',
+                                          ),
+                                          Text(
+                                            'Rating Description: ${movie.ratingDescription ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                            'Warning: ${movie.warning ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                              'Formats: ${movie.formats?.join(', ') ?? 'N/A'}'),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              leading: Image.network(movie.largePosterImageUrl!),
+                              title: Text(movie.name!),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Runtime: ${movie.runtime}'),
+                                  Text('Release Date: $formattedDate'),
+                                ],
+                              ),
+                            ),
+                          );
+                        } else {
+                          return SizedBox.shrink(); // Skip this item if it's not in another language
+                        }
                       },
                     ),
                   ],
