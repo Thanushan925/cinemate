@@ -27,6 +27,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _checkNotificationPermission();
   }
 
   @override
@@ -47,15 +48,16 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     var status = await Permission.notification.status;
 
     if (status.isGranted && alertSettingsClicked) {
-      print("enter check");
-
-      Notifs newNotif = Notifs(notificationEnabled: notificationEnabled!);
-      await LocalNotifications.model.updateAllNotif(newNotif);
+      // print("enter check");
 
       alertSettingsClicked = false;
 
       setState(() {
         notificationEnabled = true;
+        Notifs newNotif = Notifs(notificationEnabled: notificationEnabled!);
+        LocalNotifications.model.updateAllNotif(newNotif);
+        notificationEnabled = true;
+
       });
     } else if (status.isDenied) {
       setState(() {
