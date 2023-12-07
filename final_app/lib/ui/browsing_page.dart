@@ -101,7 +101,7 @@ class _BrowsingPageState extends State<BrowsingPage> {
     return MaterialApp(
       title: 'Movie List',
       // set theme according to ThemeManager
-      theme: ThemeManager.currentTheme, 
+      theme: ThemeManager.currentTheme,
       home: Scaffold(
         appBar: AppBar(
           title: !isSearching

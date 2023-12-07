@@ -58,7 +58,7 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
     while (retryCount < maxRetries) {
       try {
         Location.LocationData currentLocation =
-        await Location.Location().getLocation();
+            await Location.Location().getLocation();
         setState(() {
           _userLocation = LatLng.LatLng(
             currentLocation.latitude!,
@@ -83,9 +83,11 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
   }
 
   Future<http.Response> _delayedTileRequest(String url) async {
-    await Future.delayed(Duration(milliseconds: 100)); // Adjust the delay as needed
+    await Future.delayed(
+        Duration(milliseconds: 100)); // Adjust the delay as needed
     return http.get(Uri.parse(url));
   }
+
   // Adjust this radius based on how close you want the cinemas to be considered "near"
   static const double nearRadius = 15.0; // in kilometers
   @override
@@ -105,9 +107,9 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
           // Filter cinemas within the specified radius
           List<Cinema> nearbyCinemas = snapshot.data!
               .where((cinema) =>
-          _calculateDistance(
-              cinema.latitude, cinema.longitude, _userLocation.latitude, _userLocation.longitude) <
-              nearRadius)
+                  _calculateDistance(cinema.latitude, cinema.longitude,
+                      _userLocation.latitude, _userLocation.longitude) <
+                  nearRadius)
               .toList();
 
           return FlutterMap(
@@ -121,7 +123,7 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
             children: [
               TileLayer(
                 urlTemplate:
-                'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2FiYnktdiIsImEiOiJjbHBiZjM3ajYwZXI4Mmpwa2hpNGk1dG9hIn0.kqoF2-KAvZA5HNm7xoYXGw',
+                    'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2FiYnktdiIsImEiOiJjbHBiZjM3ajYwZXI4Mmpwa2hpNGk1dG9hIn0.kqoF2-KAvZA5HNm7xoYXGw',
                 subdomains: ['a', 'b', 'c'],
               ),
               CircleLayer(
@@ -205,7 +207,10 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
     final dLat = _toRadians(lat2 - lat1);
     final dLon = _toRadians(lon2 - lon1);
     final a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(lat1)) * cos(_toRadians(lat2)) * sin(dLon / 2) * sin(dLon / 2);
+        cos(_toRadians(lat1)) *
+            cos(_toRadians(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
     final c = 2 * atan2(sqrt(a), sqrt(1 - a));
     final distance = R * c;
     return distance;

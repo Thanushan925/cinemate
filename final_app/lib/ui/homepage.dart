@@ -129,7 +129,15 @@ class _HomeState extends State<Home> {
           future: futureMovies,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              final movies = snapshot.data!;
+              List<Movie> movies = snapshot.data!;
+
+              // Filter movies running in the last three weeks
+              movies = movies.where((movie) {
+                DateTime releaseDateTime = DateTime.parse(movie.releaseDate!);
+                DateTime today = DateTime.now();
+                Duration difference = today.difference(releaseDateTime);
+                return difference.inDays <= 21 && difference.inDays >= 0;
+              }).toList();
 
               return SingleChildScrollView(
                 child: Column(
@@ -182,7 +190,8 @@ class _HomeState extends State<Home> {
                                             'Release Date: ${movie.releaseDate}',
                                           ),
                                           Text(
-                                              'Presentation Type: ${movie.presentationType}'),
+                                            'Presentation Type: ${movie.presentationType}',
+                                          ),
                                         ],
                                       ),
                                     );
@@ -206,7 +215,7 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     Text(
-                      'All Movies',
+                      'Currently Playing',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -254,7 +263,8 @@ class _HomeState extends State<Home> {
                                         Text('Runtime: ${movie.runtime}'),
                                         Text('Release Date: $formattedDate'),
                                         Text(
-                                            'Presentation Type: ${movie.presentationType}'),
+                                          'Presentation Type: ${movie.presentationType}',
+                                        ),
                                       ],
                                     ),
                                   );
