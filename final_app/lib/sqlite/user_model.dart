@@ -48,4 +48,16 @@ class UserModel{
       whereArgs: [user.id],
     );
   }
+
+  Future<bool> userExist(String username) async{
+    final db = await UserDBUtils.init();
+
+    final List result = await db.query(
+      'users_info',
+      where: 'username = ?',
+      whereArgs: [username],
+    );
+
+    return result.isNotEmpty;
+  }
 }

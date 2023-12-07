@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:final_app/ui/account_page.dart';
+import 'package:final_app/sqlite/user_model.dart';
+import 'package:final_app/sqlite/user.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -13,6 +15,10 @@ class _SignInState extends State<SignIn> {
   final TextEditingController _passwordController = TextEditingController();
   String? isExist;
   bool isLoading = false;
+  final _model = UserModel();
+  List checkUser = [];
+  bool checking = false;
+  bool mounted = false;
 
   // SignIn({required this.isExistController});
 
@@ -43,6 +49,11 @@ class _SignInState extends State<SignIn> {
             'isExist': querySnapshot.docs.isNotEmpty.toString(),
             'username': extractUsername(username)
           });
+          checking = await _model.userExist(username);
+          if(checking == false){
+            _addUser(username, password);
+          }
+          _readUser();
         }
         else
         {
@@ -56,6 +67,43 @@ class _SignInState extends State<SignIn> {
           isLoading = false;
         });
       }
+    }
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    mounted = true;
+  }
+
+  @override
+  void dispose(){
+    mounted = false;
+    super.dispose();
+  }
+
+  Future _addUser(String username, String password) async{
+      User newuser = User(id: null, username: username, password: password);
+      int insertedUser = await _model.insertUser(newuser);
+
+      if(insertedUser != null){
+       print("Added to local storage!");
+      }
+
+
+    }
+
+  Future _readUser() async{
+    List users = await _model.getAllUsers();
+    if(mounted == true){
+      setState(() {
+          checkUser = users;
+      });
+    }
+    print(' ');
+    print("All the Users: ");
+    for(User user in users){
+      print(user);
     }
   }
 
