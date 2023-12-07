@@ -27,7 +27,6 @@ class LocalNotifications {
 
   Future<int> getNotifs() async{
     List users = await model.getNotif();
-    print("here user[0] = ${users[0].enableNotif}****************************");
     return users[0].enableNotif;
   }
 

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'movie_detail.dart';
+import 'theme.dart';
 
 class Movie {
   final int id;
@@ -57,8 +58,6 @@ Future<List<Movie>> fetchMovies() async {
   }
 }
 
-void main() => runApp(const BrowsingPage());
-
 class BrowsingPage extends StatefulWidget {
   const BrowsingPage({Key? key});
 
@@ -101,6 +100,8 @@ class _BrowsingPageState extends State<BrowsingPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Movie List',
+      // set theme according to ThemeManager
+      theme: ThemeManager.currentTheme, 
       home: Scaffold(
         appBar: AppBar(
           title: !isSearching

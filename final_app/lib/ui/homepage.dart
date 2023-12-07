@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:theme_provider/theme_provider.dart';
+import 'theme.dart';
 
 class Movie {
   int? id;
@@ -117,6 +118,8 @@ class _HomeState extends State<Home> {
             icon: Icon(Icons.lightbulb_outline),
             onPressed: () {
               ThemeProvider.controllerOf(context).nextTheme();
+              // update theme for browsing page
+              ThemeManager.setTheme(ThemeProvider.themeOf(context).data);
             },
           ),
         ],
