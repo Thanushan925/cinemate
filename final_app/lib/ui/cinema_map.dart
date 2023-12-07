@@ -82,12 +82,6 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
     }
   }
 
-  Future<http.Response> _delayedTileRequest(String url) async {
-    await Future.delayed(
-        Duration(milliseconds: 100)); // Adjust the delay as needed
-    return http.get(Uri.parse(url));
-  }
-
   // Adjust this radius based on how close you want the cinemas to be considered "near"
   static const double nearRadius = 15.0; // in kilometers
   @override
@@ -107,9 +101,9 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
           // Filter cinemas within the specified radius
           List<Cinema> nearbyCinemas = snapshot.data!
               .where((cinema) =>
-                  _calculateDistance(cinema.latitude, cinema.longitude,
-                      _userLocation.latitude, _userLocation.longitude) <
-                  nearRadius)
+          _calculateDistance(cinema.latitude, cinema.longitude,
+              _userLocation.latitude, _userLocation.longitude) <
+              nearRadius)
               .toList();
 
           return FlutterMap(
@@ -123,7 +117,7 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
             children: [
               TileLayer(
                 urlTemplate:
-                    'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2FiYnktdiIsImEiOiJjbHBiZjM3ajYwZXI4Mmpwa2hpNGk1dG9hIn0.kqoF2-KAvZA5HNm7xoYXGw',
+                'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZ2FiYnktdiIsImEiOiJjbHBiZjM3ajYwZXI4Mmpwa2hpNGk1dG9hIn0.kqoF2-KAvZA5HNm7xoYXGw',
                 subdomains: ['a', 'b', 'c'],
               ),
               CircleLayer(
@@ -140,55 +134,51 @@ class _CinemaMapPageState extends State<CinemaMapPage> {
               MarkerLayer(
                 markers: nearbyCinemas.map((cinema) {
                   return Marker(
-                    width: 200.0,
-                    height: 150.0,
+                    width: 50,
+                    height: 50,
                     point: LatLng.LatLng(cinema.latitude, cinema.longitude),
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 200,
-                          padding: EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Text(
-                            cinema.name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          width: 80,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Distance:',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) => AlertDialog(
+                            title: Text(cinema.name),
+                            content: Container(
+
+                              height: MediaQuery.of(context).size.height / 8,
+                              child: Column(
+                                children: [
+                                  // Use a conditional expression to check if the image URL is not null
+                                  cinema.mobileBackgroundImageUrl != null
+                                      ? Image.network(
+                                    cinema.mobileBackgroundImageUrl!,
+                                    fit: BoxFit.cover,
+                                    height: 80,
+                                    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                                      return Text('Image not available');
+                                    },
+                                  )
+                                      : Text('Image not available'),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Distance: ${_calculateDistance(cinema.latitude, cinema.longitude, _userLocation.latitude, _userLocation.longitude).toStringAsFixed(2)} km',
+                                  ),
+                                ],
                               ),
-                              Text(
-                                '${_calculateDistance(cinema.latitude, cinema.longitude, _userLocation.latitude, _userLocation.longitude).toStringAsFixed(2)} km',
+                            ),
+
+                            actions: <Widget>[
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Close'),
                               ),
                             ],
                           ),
-                        ),
-                        Container(
-                          width: 50,
-                          height: 50,
-                          child: Image.network(
-                            'https://cdn4.iconfinder.com/data/icons/evil-icons-user-interface/64/location-512.png', // Replace with your marker icon URL
-                          ),
-                        ),
-                      ],
+                        );
+                      },
+                      child: Icon(Icons.location_on, color: Colors.red),
                     ),
                   );
                 }).toList(),

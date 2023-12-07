@@ -50,6 +50,9 @@ class CinemaDetailPage extends StatelessWidget {
                 ? Image.network(
               cinema.mobileBackgroundImageUrl!,
               fit: BoxFit.cover, // Use BoxFit.cover to display the full image
+              errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                return Text('Image not available');
+              },
             )
                 : Text('Image not available'),
           ],
