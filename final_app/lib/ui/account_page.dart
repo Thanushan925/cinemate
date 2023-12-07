@@ -17,7 +17,7 @@ class AccountPage extends StatefulWidget {
 class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   static String? _isExist;
   static String? _username;
-  static bool notificationEnabled = false;
+  static bool? notificationEnabled = false;
   static bool isAlertDialogShowing = false;
   static bool alertSettingsClicked = false;
 
@@ -39,7 +39,6 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && !isAlertDialogShowing) {
       // this block will be executed when the app is resumed
-      print("Back to app");
       _checkNotificationPermission();
     }
   }
@@ -50,8 +49,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     if (status.isGranted && alertSettingsClicked) {
       print("enter check");
 
-      // perform asynchronous work without updating the widget state
-      Notifs newNotif = Notifs(notificationEnabled: notificationEnabled);
+      Notifs newNotif = Notifs(notificationEnabled: notificationEnabled!);
       await LocalNotifications.model.updateAllNotif(newNotif);
 
       alertSettingsClicked = false;
@@ -253,7 +251,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                   ),
                   Spacer(),
                   Switch(
-                    value: notificationEnabled,
+                    value: notificationEnabled!,
                     onChanged: (value) async {
                       final status = await Permission.notification.request();
                       if (notificationEnabled == false &&

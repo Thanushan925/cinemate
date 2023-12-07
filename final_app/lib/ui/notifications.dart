@@ -12,14 +12,13 @@ class LocalNotifications {
   static bool showNotificationEnable = false;
   static NotifModel model = NotifModel();
   static bool isEnabled = false;
-  // List<dynamic> allNotifs = []; //just for testing
 
   LocalNotifications() {
     initializeNotifications();
   }
 
   Future _readNotifs() async{
-    List users = await model.getNotif();
+    List users = await LocalNotifications.model.getNotif();
     for(Notifs notif in users){
       print(notif);
     }
@@ -50,11 +49,13 @@ class LocalNotifications {
       if(preStatus != PermissionStatus.granted)
       {
         bool result = status == PermissionStatus.granted;
-        AccountPageState.notificationEnabled = result;
+        AccountPageState.notificationEnabled = result;        
+
         isEnabled = result;
 
         Notifs newNotif = Notifs(notificationEnabled: result);
-        LocalNotifications.model.updateAllNotif(newNotif);
+        model.addNotif(newNotif);
+
       }
       else if(status == PermissionStatus.granted)
       {
@@ -63,7 +64,7 @@ class LocalNotifications {
         isEnabled = result;
 
         Notifs newNotif = Notifs(notificationEnabled: result);
-        LocalNotifications.model.updateAllNotif(newNotif);
+        model.updateAllNotif(newNotif);
       }
       else if(status != PermissionStatus.granted)
       {

@@ -26,6 +26,14 @@ class NotifModel{
     );
   }
 
+  Future<int> addNotif(Notifs notif) async {
+    final db = await notifDB.init();
+    return db.insert(
+      'notif',
+      notif.toMap(),
+    );
+  }
+
   Future<bool> isEmpty() async{
     final db = await notifDB.init();
     var count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM notif'));
