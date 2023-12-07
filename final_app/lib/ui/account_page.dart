@@ -108,6 +108,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     );
   }
 
+  // sign out current user
   void _signOut() {
     setState(() {
       _isExist = 'false';
@@ -115,6 +116,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     });
   }
 
+  // sign in
   void _navigateSignIn(BuildContext context) async {
     final result = await Navigator.push(
       context,
@@ -133,6 +135,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
     }
   }
 
+  // sign up
   void _navigateSignUp(BuildContext context) async {
     final result = await Navigator.push(
       context,
@@ -163,6 +166,7 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
               icon: Icon(Icons.logout),
               onPressed: () {
                 _signOut();
+                showSnackBar("Sign out Successful.", 'true', context);
               },
             ),
         ],
