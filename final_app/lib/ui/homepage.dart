@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:theme_provider/theme_provider.dart';
+import 'movie_detail.dart';
 import 'theme.dart';
 
 class Movie {
@@ -12,6 +13,10 @@ class Movie {
   String? releaseDate;
   String? largePosterImageUrl;
   String? presentationType;
+  String? marketLanguageCode;
+  String? ratingDescription;
+  String? warning;
+  List<String>? formats;
 
   Movie({
     required this.id,
@@ -20,6 +25,10 @@ class Movie {
     required this.releaseDate,
     required this.largePosterImageUrl,
     required this.presentationType,
+    this.marketLanguageCode,
+    this.ratingDescription,
+    this.warning,
+    this.formats,
   });
 
   Movie.fromMap(Map map) {
@@ -29,6 +38,9 @@ class Movie {
     releaseDate = map['releaseDate'];
     largePosterImageUrl = map['largePosterImageUrl'];
     presentationType = map['presentationType'];
+    ratingDescription = map['ratingDescription'];
+    warning = map['warning'] as String?;
+    formats = List<String>.from(map['formats'] ?? []);
   }
 
   Map<String, Object?> toMap() {
@@ -38,11 +50,15 @@ class Movie {
       'runtime': this.runtime,
       'releaseDate': this.releaseDate,
       'largePosterImageUrl': this.largePosterImageUrl,
+      'marketLanguageCode': this.marketLanguageCode,
+      'ratingDescription': this.ratingDescription,
+      'warning': this.warning,
+      'formats': this.formats,
     };
   }
 
   String toString() {
-    return "Movie id: $id, name: $name, runtime: $runtime, release date: $releaseDate, presentation type: $presentationType";
+    return "Movie id: $id, name: $name, runtime: $runtime, release date: $releaseDate, presentation type: $presentationType, MarketLanguageCode: $marketLanguageCode, Rating Description: $ratingDescription, warning: $warning, Formats: $formats";
   }
 }
 
@@ -61,6 +77,10 @@ Future<List<Movie>> fetchMovies() async {
         releaseDate: movie['releaseDate'] as String,
         largePosterImageUrl: movie['largePosterImageUrl'] as String,
         presentationType: movie['presentationType'] as String?,
+        marketLanguageCode: movie['marketLanguageCode'] as String?,
+        ratingDescription: movie['ratingDescription'] as String?,
+        warning: movie['warning'] as String?,
+        formats: List<String>.from(movie['formats'] ?? []),
       );
     }).toList();
 
@@ -138,23 +158,32 @@ class _HomeState extends State<Home> {
                 Duration difference = today.difference(releaseDateTime);
                 return difference.inDays <= 21 && difference.inDays >= 0;
               }).toList();
+              List<Movie> englishMovies = movies
+                  .where((movie) => movie.marketLanguageCode == 'EN')
+                  .toList();
 
               return SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
-                    SizedBox(height: 10),
+                    SizedBox(height: 12),
                     Text(
-                      'Popular',
+                      'Language: English',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
+                    SizedBox(height: 20), // Add some space here
                     Container(
                       height: 300,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
-                        itemCount: movies.length,
+                        itemCount: englishMovies.length,
                         itemBuilder: (context, index) {
-                          final movie = movies[index];
+                          final movie = englishMovies[index];
+
+                          DateTime releaseDateTime =
+                              DateTime.parse(movie.releaseDate!);
+                          String formattedDate =
+                              "${releaseDateTime.day}-${releaseDateTime.month}-${releaseDateTime.year}";
 
                           return Padding(
                             padding:
@@ -186,11 +215,21 @@ class _HomeState extends State<Home> {
                                           ),
                                           SizedBox(height: 20),
                                           Text('Runtime: ${movie.runtime}'),
-                                          Text(
-                                            'Release Date: ${movie.releaseDate}',
-                                          ),
+                                          Text('Release Date: $formattedDate'),
                                           Text(
                                             'Presentation Type: ${movie.presentationType}',
+                                          ),
+                                          Text(
+                                            'Market Language: ${movie.marketLanguageCode}',
+                                          ),
+                                          Text(
+                                            'Rating Description: ${movie.ratingDescription ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                            'Warning: ${movie.warning ?? 'N/A'}',
+                                          ),
+                                          Text(
+                                            'Formats: ${movie.formats?.join(', ') ?? 'N/A'}',
                                           ),
                                         ],
                                       ),
@@ -265,6 +304,17 @@ class _HomeState extends State<Home> {
                                         Text(
                                           'Presentation Type: ${movie.presentationType}',
                                         ),
+                                        Text(
+                                          'Market Language: ${movie.marketLanguageCode}',
+                                        ),
+                                        Text(
+                                          'Rating Description: ${movie.ratingDescription ?? 'N/A'}',
+                                        ),
+                                        Text(
+                                          'Warning: ${movie.warning ?? 'N/A'}',
+                                        ),
+                                        Text(
+                                            'Formats: ${movie.formats?.join(', ') ?? 'N/A'}'),
                                       ],
                                     ),
                                   );
