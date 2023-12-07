@@ -1,3 +1,5 @@
+//chatgpt was used as a reference along with the lecture codes provided for this project
+
 import 'package:flutter/material.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'ui/nav.dart';
