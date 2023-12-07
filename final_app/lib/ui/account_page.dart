@@ -334,15 +334,6 @@ class AccountPageState extends State<AccountPage> with WidgetsBindingObserver {
                                           '\n\nYou agree not to use the App for any unlawful or prohibited purpose. Unauthorized access or use of the App is strictly prohibited.',
                                     ),
                                     TextSpan(
-                                      text: '\n\nData Accuracy:',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    TextSpan(
-                                      text:
-                                          '\n\nWhile we strive to provide accurate and up-to-date information, we do not guarantee the accuracy, completeness, or reliability of any content within the App.',
-                                    ),
-                                    TextSpan(
                                       text: '\n\nIntellectual Property:',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),

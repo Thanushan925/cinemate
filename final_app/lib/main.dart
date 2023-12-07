@@ -21,11 +21,9 @@ class MyApp extends StatelessWidget {
           if (savedTheme == 'light_theme') {
             // change the theme to light for browsing page
             ThemeManager.setTheme(ThemeData.light());
-          } 
-          else {
-            ThemeManager.setTheme(ThemeData.dark()); 
+          } else {
+            ThemeManager.setTheme(ThemeData.dark());
           }
-
         }
       },
       themes: <AppTheme>[
